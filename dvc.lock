@@ -1,0 +1,41 @@
+schema: '2.0'
+stages:
+  extract_images_from_video:
+    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video
+      data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames
+      150
+    deps:
+    - path: data/raw/video/video.MP4
+      md5: 36448c49d0b5d6aa6a342c4e3edef5a5
+      size: 257059112
+    outs:
+    - path: data/raw/images
+      md5: e879536c9f394c1bb6b92b7e1217942c.dir
+      size: 232315572
+      nfiles: 152
+  crop_and_resize_images:
+    cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder
+      data/raw/images --path_to_cropped_images_folder data/interim/
+    deps:
+    - path: data/raw/images
+      md5: e879536c9f394c1bb6b92b7e1217942c.dir
+      size: 232315572
+      nfiles: 152
+    outs:
+    - path: data/interim
+      md5: 6e32914486ebb54703b7e1367f47ed9c.dir
+      size: 49599021
+      nfiles: 152
+  remove_background:
+    cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder
+      data/interim/ --images_no_background data/processed --model_type new
+    deps:
+    - path: data/interim/
+      md5: 6e32914486ebb54703b7e1367f47ed9c.dir
+      size: 49599021
+      nfiles: 152
+    outs:
+    - path: data/processed
+      md5: f673a323995e04e93bfaaf80c5182bfc.dir
+      size: 176082673
+      nfiles: 152
