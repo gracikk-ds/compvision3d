@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "compvis3d"
+version = "0.1.0"
+description = "nvdiffrec based 3d reconstraction"
+authors = ["team <epam@epam.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.9.0,<3.10.0"
+click = "^8.0.3"
+dvc = {extras = ["gs"], version = "*"}
+flake8 = "^4.0.1"
+black = "^22.3.0"
+torch = "^1.11.0"
+opencv-python = "^4.6.0"
+Pillow = "^9.0.1"
+torchvision = "^0.12.0"
+scikit-image = "^0.19.1"
+pre-commit = "^2.19.0"
+rembg = "^2.0.21"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

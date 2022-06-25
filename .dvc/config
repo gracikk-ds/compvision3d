@@ -1,0 +1,5 @@
+[core]
+    remote = origin
+    autostage = true
+['remote "origin"']
+    url = gs://3dreconstraction

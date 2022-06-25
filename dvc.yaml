@@ -1,0 +1,36 @@
+stages:
+
+  extract_images_from_video:
+    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames 150
+    deps:
+      - data/raw/video/video.MP4
+    outs:
+      - data/raw/images
+
+  crop_and_resize_images:
+    cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder data/raw/images --path_to_cropped_images_folder data/interim/
+    deps:
+      - data/raw/images
+    outs:
+      - data/interim
+
+  remove_background:
+    cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder data/interim/ --images_no_background data/processed --model_type new
+    deps:
+      - data/interim/
+    outs:
+      - data/processed
+
+  colmap:
+    cmd: python scripts/run_colmap.py --colmap_db  --images  --text  --colmap_matcher sequential
+    deps:
+      - data/processed
+    outs:
+      - data/results/colmap
+
+  colmap2nerf:
+    cmd: python scripts/colmap2nerf.py --image_folder  --colmap_text_folder  --out transforms.json
+    deps:
+      - data/results/colmap
+    outs:
+      - data/results/transformation
