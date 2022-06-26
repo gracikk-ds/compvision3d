@@ -4,6 +4,7 @@ import json
 import math
 import click
 import numpy as np
+from pathlib import Path
 
 
 def variance_of_laplacian(image):
@@ -151,26 +152,28 @@ def get_colmap_images(text_folder, image_folder, out):
                 c2w = c2w[[1, 0, 2, 3], :]  # swap y and z
                 c2w[2, :] *= -1  # flip whole world upside down
                 up += c2w[0:3, 1]
-
-                frame = {"file_path": name, "sharpness": b, "transform_matrix": c2w}
+                
+                file_path = f"../images/{Path(name).stem}"
+                frame = {"file_path": file_path, "sharpness": b, "transform_matrix": c2w}
                 out["frames"].append(frame)
-                return out, up
+    return out, up
 
 
 @click.command()
-@click.option("--aabb_scale", default=4, choices=["1", "2", "4", "8", "16"])
-@click.option("--image_folder", default="images")
-@click.option("--colmap_text_folder", default="colmap_text_folder")
-@click.option("--out", default="transforms.json")
-def colmap2nerf(aabb_scale, image_folder, colmap_text_folder, output_filename):
+@click.option("--aabb_scale", default=4)
+@click.option("--image_folder", default="data/processed/images")
+@click.option("--colmap_text_folder", default="data/processed/colmap_db/colmap_text")
+@click.option("--output", default="data/processed/configs/nerf_transforms.json")
+def colmap2nerf(aabb_scale, image_folder, colmap_text_folder, output):
     """
     Convert colmap format to nerf
     @param aabb_scale: large scene scale factor.
     1=scene fits in unit cube; power of 2 up to 16
     @param image_folder: input path to the images
     @param colmap_text_folder: path to colmap text folder
-    @param output_filename: name of output file
+    @param output: name of output file
     """
+    print("start colmap2nerf")
     (
         w,
         h,
@@ -210,7 +213,6 @@ def colmap2nerf(aabb_scale, image_folder, colmap_text_folder, output_filename):
 
     # don't keep colmap coords - reorient the scene to be easier to work with
     up = up / np.linalg.norm(up)
-    print("up vector was", up)
     R = rotmat(up, [0, 0, 1])  # rotate up vector to [0,0,1]
     R = np.pad(R, [0, 1])
     R[-1, -1] = 1
@@ -219,13 +221,14 @@ def colmap2nerf(aabb_scale, image_folder, colmap_text_folder, output_filename):
         f["transform_matrix"] = np.matmul(
             R, f["transform_matrix"]
         )  # rotate up to be the z axis
-
+    
     # find a central point they are all looking at
     print("computing center of attention...")
     totw = 0.0
     totp = np.array([0.0, 0.0, 0.0])
     for f in out["frames"]:
         mf = f["transform_matrix"][0:3, :]
+        print(mf, "\n")
         for g in out["frames"]:
             mg = g["transform_matrix"][0:3, :]
             p, w = closest_point_2_lines(mf[:, 3], mf[:, 2], mg[:, 3], mg[:, 2])
@@ -248,8 +251,8 @@ def colmap2nerf(aabb_scale, image_folder, colmap_text_folder, output_filename):
     for f in out["frames"]:
         f["transform_matrix"] = f["transform_matrix"].tolist()
     print(nframes, "frames")
-    print(f"writing {output_filename}")
-    with open(output_filename, "w") as outfile:
+    print(f"writing {output}")
+    with open(output, "w") as outfile:
         json.dump(out, outfile, indent=2)
 
 

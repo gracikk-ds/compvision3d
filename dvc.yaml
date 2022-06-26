@@ -19,25 +19,26 @@ stages:
     deps:
       - data/interim/
     outs:
-      - data/processed/images
+      - data/processed/images/
 
   colmap:
-    cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db --text data/processed/colmap_db/colmap_text  --colmap_matcher sequential
+    cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db --text data/processed/colmap_db/colmap_text  --colmap_matcher exhaustive
     deps:
       - data/processed/images
     outs:
       - data/processed/colmap_db/
 
   colmap2nerf:
-    cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder data/processed/colmap_db/colmap_text --out data/processed/configs/nerf_transforms.json
+    cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
     deps:
-      - data/results/colmap
+      - data/processed/colmap_db/
     outs:
-      - data/results/transformation
+      - data/processed/configs/nerf_transforms.json
 
   reconstraction:
     cmd: python scripts/reconstraction.py --config data/processed/configs/global_config.json
     deps:
+      - data/processed/configs/nerf_transforms.json
       - data/processed/configs/global_config.json
     outs:
-      - data/results
+      - data/results/

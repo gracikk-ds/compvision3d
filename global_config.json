@@ -1,0 +1,16 @@
+{
+    "ref_mesh": "data/processed/configs/",
+    "random_textures": true,
+    "iter": 2500,
+    "save_interval": 500,
+    "texture_res": [2048, 2048],
+    "train_res": [1000, 1000],
+    "batch": 5,
+    "learning_rate": [0.03, 0.01],
+    "ks_min" : [0, 0.25, 0.0],
+    "custom_mip" : true,
+    "display": [{"latlong" : true}, {"bsdf" : "kd"}, {"bsdf" : "ks"}, {"bsdf" : "normal"}],
+    "layers" : 4,
+    "background" : "white",
+    "out_dir": "data/results"
+}

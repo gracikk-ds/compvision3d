@@ -48,7 +48,9 @@ def run_colmap(
     images, colmap_db, text, colmap_camera_model, colmap_camera_params, colmap_matcher
 ):
     # vars preprocessing
-
+    print("start run_colmap")
+    os.makedirs(Path(colmap_db).parent, exist_ok=True)
+    
     # images
     images = '"' + images + '"'
 

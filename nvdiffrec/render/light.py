@@ -154,7 +154,7 @@ class EnvironmentLight(torch.nn.Module):
             if not hasattr(self, "_FG_LUT"):
                 self._FG_LUT = torch.as_tensor(
                     np.fromfile(
-                        "data/irrmaps/bsdf_256_256.bin", dtype=np.float32
+                        "data/processed/irrmaps/bsdf_256_256.bin", dtype=np.float32
                     ).reshape(1, 256, 256, 2),
                     dtype=torch.float32,
                     device="cuda",
@@ -220,6 +220,7 @@ def save_env_map(fn, light):
 
 
 def create_trainable_env_rnd(base_res, scale=0.5, bias=0.25):
+    print("here we create instance of EnvironmentLight")
     base = (
         torch.rand(6, base_res, base_res, 3, dtype=torch.float32, device="cuda") * scale
         + bias

@@ -28,22 +28,39 @@ stages:
       nfiles: 152
   remove_background:
     cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder
-      data/interim/ --images_no_background data/processed --model_type new
+      data/interim/ --images_no_background data/processed/images --model_type new
     deps:
     - path: data/interim/
       md5: 6e32914486ebb54703b7e1367f47ed9c.dir
       size: 49599021
       nfiles: 152
     outs:
-    - path: data/processed
-      md5: f673a323995e04e93bfaaf80c5182bfc.dir
-      size: 176082673
+    - path: data/processed/images/
+      md5: 8c0e97a145b768f494cfca3f46dcbd67.dir
+      size: 177160908
       nfiles: 152
   colmap:
     cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db
-      --text data/processed/colmap_db/colmap_text  --colmap_matcher sequential
+      --text data/processed/colmap_db/colmap_text  --colmap_matcher exhaustive
     deps:
     - path: data/processed/images
-      md5: f673a323995e04e93bfaaf80c5182bfc.dir
-      size: 176082673
+      md5: 8c0e97a145b768f494cfca3f46dcbd67.dir
+      size: 177160908
       nfiles: 152
+    outs:
+    - path: data/processed/colmap_db/
+      md5: 8f22312c21f4d3ce6500eda5d3cb26d0.dir
+      size: 95994849
+      nfiles: 12
+  colmap2nerf:
+    cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder
+      data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
+    deps:
+    - path: data/processed/colmap_db/
+      md5: 8f22312c21f4d3ce6500eda5d3cb26d0.dir
+      size: 95994849
+      nfiles: 12
+    outs:
+    - path: data/processed/configs/nerf_transforms.json
+      md5: 17f9c109834b75940e734f2c118d1c24
+      size: 8638

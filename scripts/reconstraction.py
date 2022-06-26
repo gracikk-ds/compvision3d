@@ -8,6 +8,13 @@
 # its affiliates is strictly prohibited.
 
 import os
+import sys
+import inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir)
+
 import time
 import argparse
 import json
@@ -704,7 +711,7 @@ if __name__ == "__main__":
     FLAGS.sdf_regularizer = 0.2  # Weight for sdf regularizer (see paper for details)
     FLAGS.laplace = "relative"  # Mesh Laplacian ["absolute", "relative"]
     FLAGS.laplace_scale = (
-        5000  # Weight for sdf regularizer. Default is relative with large weight
+        7500  # Weight for sdf regularizer. Default is relative with large weight
     )
     FLAGS.pre_load = True  # Pre-load entire dataset into memory for faster training
     FLAGS.kd_min = [0.0, 0.0, 0.0, 0.0]  # Limits for kd
@@ -769,7 +776,9 @@ if __name__ == "__main__":
     # ==============================================================================================
 
     if FLAGS.learn_light:
+        print("we are learning light")
         lgt = light.create_trainable_env_rnd(512, scale=0.0, bias=0.5)
+        print(lgt.type)
     else:
         lgt = light.load_env(FLAGS.envmap, scale=FLAGS.env_scale)
 

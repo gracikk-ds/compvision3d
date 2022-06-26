@@ -36,6 +36,7 @@ def extract_images_from_video(
     @param amount_of_frames: desirable amount of images to extract
     @return: None
     """
+    print("start extract_images_from_video")
     os.makedirs(path_to_images_folder, exist_ok=True)
     path_to_images_folder = Path(path_to_images_folder)
     # Read the video from specified path
@@ -76,6 +77,7 @@ def crop_resize_images(
     @param path_to_cropped_images_folder: path to save cropped images
     @return: None
     """
+    print("start crop_resize_images")
     os.makedirs(path_to_cropped_images_folder, exist_ok=True)
     path_to_cropped_images_folder = Path(path_to_cropped_images_folder)
     images = [x for x in Path(path_to_images_folder).glob("*.jpg")]
@@ -111,6 +113,7 @@ def remove_background(
     @param images_no_background: path to save processed images
     @return: None
     """
+    print("start remove_background")
     os.makedirs(images_no_background, exist_ok=True)
 
     if model_type == "new":

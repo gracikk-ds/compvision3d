@@ -7,25 +7,24 @@ authors = ["team <epam@epam.com>"]
 [tool.poetry.dependencies]
 python = ">=3.9.0,<3.10.0"
 glfw = "2.5.3"
-gdown = "4.5.1"
-ninja = "1.7.2"
+gdown = "4.4.0"
 xatlas = "0.0.6"
 click = "^8.0.3"
-torch = "^1.11.0"
-rembg = "^2.0.21"
+rembg = {extras = ["gpu"], version = "^2.0.21"}
 Pillow = "^9.0.1"
 imageio = "2.19.3"
-PyOpenGL = "3.1.6"
-cudatoolkit = "11.3"
 pre-commit = "^2.19.0"
-torchvision = "^0.12.0"
 scikit-image = "^0.19.1"
 opencv-python = "^4.6.0"
 dvc = {extras = ["gs"], version = "*"}
 
 # pip install git+https://github.com/NVlabs/nvdiffrast/
 # pip install --global-option="--no-networks" git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
+# conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 # imageio_download_bin freeimage
+ninja = "^1.10.2"
+PyOpenGL = "^3.1.6"
+torch = "^1.11.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"

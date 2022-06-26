@@ -115,10 +115,10 @@ def shade(
     assert "bsdf" in material or bsdf is not None, "Material must specify a BSDF type"
     bsdf = material["bsdf"] if bsdf is None else bsdf
     if bsdf == "pbr":
-        if isinstance(lgt, light.EnvironmentLight):
-            shaded_col = lgt.shade(gb_pos, gb_normal, kd, ks, view_pos, specular=True)
-        else:
-            assert False, "Invalid light type"
+        # if isinstance(lgt, light.EnvironmentLight):
+        shaded_col = lgt.shade(gb_pos, gb_normal, kd, ks, view_pos, specular=True)
+        # else:
+        #     assert False, "Invalid light type"
     elif bsdf == "diffuse":
         if isinstance(lgt, light.EnvironmentLight):
             shaded_col = lgt.shade(gb_pos, gb_normal, kd, ks, view_pos, specular=False)

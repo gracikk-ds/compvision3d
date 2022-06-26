@@ -8,15 +8,22 @@
 # its affiliates is strictly prohibited.
 
 import os
+import sys
+import inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir)
+
 import glob
 import json
 
 import torch
 import numpy as np
 
-from render import util
+from render.render import util
 
-from .dataset import Dataset
+from dataset.dataset import Dataset
 
 ###############################################################################
 # NERF image based dataset (synthetic)
