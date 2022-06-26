@@ -11,7 +11,7 @@ import click
 import subprocess
 from tqdm import tqdm
 from pathlib import Path
-from src.inference.inference import segmentation
+from segmentation.inference.inference import segmentation
 
 
 @click.group()
@@ -102,9 +102,7 @@ def crop_resize_images(
 @click.option("--images_no_background", default="images_no_background/", type=str)
 @click.option("--model_type", default="new", type=click.Choice(["new", "old"]))
 def remove_background(
-    path_to_cropped_images_folder: str,
-    images_no_background: str,
-    model_type: str
+    path_to_cropped_images_folder: str, images_no_background: str, model_type: str
 ) -> None:
     """
     Run background removal net.

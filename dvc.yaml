@@ -15,22 +15,29 @@ stages:
       - data/interim
 
   remove_background:
-    cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder data/interim/ --images_no_background data/processed --model_type new
+    cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder data/interim/ --images_no_background data/processed/images --model_type new
     deps:
       - data/interim/
     outs:
-      - data/processed
+      - data/processed/images
 
   colmap:
-    cmd: python scripts/run_colmap.py --colmap_db  --images  --text  --colmap_matcher sequential
+    cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db --text data/processed/colmap_db/colmap_text  --colmap_matcher sequential
     deps:
-      - data/processed
+      - data/processed/images
     outs:
-      - data/results/colmap
+      - data/processed/colmap_db/
 
   colmap2nerf:
-    cmd: python scripts/colmap2nerf.py --image_folder  --colmap_text_folder  --out transforms.json
+    cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder data/processed/colmap_db/colmap_text --out data/processed/configs/nerf_transforms.json
     deps:
       - data/results/colmap
     outs:
       - data/results/transformation
+
+  reconstraction:
+    cmd: python scripts/reconstraction.py --config data/processed/configs/global_config.json
+    deps:
+      - data/processed/configs/global_config.json
+    outs:
+      - data/results

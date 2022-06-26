@@ -7,8 +7,8 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 
 # custom modules
-from src.unet.u2net import U2NET
-from src.data.data_loader import (
+from segmentation.unet.u2net import U2NET
+from segmentation.data.data_loader import (
     RescaleT,
     ToTensorLab,
     SalObjDataset,
@@ -50,7 +50,9 @@ def segmentation(
     print("images: ", images)
 
     net = U2NET(3, 1)
-    net.load_state_dict(torch.load(str(ROOT / model_dir), map_location=torch.device("cpu")))
+    net.load_state_dict(
+        torch.load(str(ROOT / model_dir), map_location=torch.device("cpu"))
+    )
     net.eval()
 
     files = list(images.glob("*.jpg"))
@@ -92,6 +94,4 @@ def segmentation(
                 str(output_masks / filename.with_suffix(".png").name), u2netresult
             )
 
-            cv2.imwrite(
-                str(output_rgba / filename.with_suffix(".png").name), img_rgba
-            )
+            cv2.imwrite(str(output_rgba / filename.with_suffix(".png").name), img_rgba)

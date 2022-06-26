@@ -14,8 +14,8 @@ def do_system(arg):
 
 
 @click.command()
-@click.option("--colmap_db", default="colmap.db", help="colmap database filename")
 @click.option("--images", default="images", help="input path to the images")
+@click.option("--colmap_db", default="colmap.db", help="colmap database filename")
 @click.option(
     "--text",
     default="colmap_text",
@@ -45,7 +45,7 @@ def do_system(arg):
     " exhaustive for adhoc images",
 )
 def run_colmap(
-    colmap_db, images, text, colmap_camera_model, colmap_camera_params, colmap_matcher
+    images, colmap_db, text, colmap_camera_model, colmap_camera_params, colmap_matcher
 ):
     # vars preprocessing
 
@@ -65,7 +65,7 @@ def run_colmap(
 
     print(
         f"running colmap with:"
-        f"\n\tdb={db}\n\timages={images}\n\tsparse={sparse}\n\ttext={text}"
+        f"\n\timages={images}\n\tdb={db}\n\tsparse={sparse}\n\ttext={text}"
     )
 
     warning_msg = (
@@ -133,3 +133,7 @@ def run_colmap(
         f"--output_path {text} "
         f"--output_type TXT"
     )
+
+
+if __name__ == "__main__":
+    run_colmap()

@@ -39,3 +39,11 @@ stages:
       md5: f673a323995e04e93bfaaf80c5182bfc.dir
       size: 176082673
       nfiles: 152
+  colmap:
+    cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db
+      --text data/processed/colmap_db/colmap_text  --colmap_matcher sequential
+    deps:
+    - path: data/processed/images
+      md5: f673a323995e04e93bfaaf80c5182bfc.dir
+      size: 176082673
+      nfiles: 152
