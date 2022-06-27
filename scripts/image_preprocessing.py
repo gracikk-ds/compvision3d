@@ -64,14 +64,10 @@ def get_camera_init_qt(meta_):
     :param meta_: parsed metadata
     :return: tuple of (R|T) quaternions
     """
-    R_acute = quaternion.from_rotation_vector(
-        [np.pi / 2 + np.arcsin(meta_["h"] / meta_["l"]), 0, 0]
-    )
+    R_acute = quaternion.from_rotation_vector([-(np.pi/2+np.arcsin(meta_['h']/meta_['l'])),0,0])
 
-    T = quaternion.from_vector_part(
-        [0, -np.sqrt(meta_["l"] ** 2 - meta_["h"] ** 2), meta_["h"]]
-    )
-    return R_acute, T
+    T = quaternion.from_vector_part([0, -np.sqrt(meta_['l']**2-meta_['h']**2), meta_['h']])
+    return R_acute,T
 
 
 def rotate_by_theta(theta_, camera_position):
