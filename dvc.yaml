@@ -3,6 +3,7 @@ stages:
   extract_images_from_video:
     cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames 150
     deps:
+      - scripts/image_preprocessing.py
       - data/raw/video/video.MP4
     outs:
       - data/raw/images
@@ -10,6 +11,7 @@ stages:
   crop_and_resize_images:
     cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder data/raw/images --path_to_cropped_images_folder data/interim/
     deps:
+      - scripts/image_preprocessing.py
       - data/raw/images
     outs:
       - data/interim
@@ -17,6 +19,7 @@ stages:
   remove_background:
     cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder data/interim/ --images_no_background data/processed/images --model_type new
     deps:
+      - scripts/image_preprocessing.py
       - data/interim/
     outs:
       - data/processed/images/
@@ -24,6 +27,7 @@ stages:
   colmap:
     cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db --text data/processed/colmap_db/colmap_text  --colmap_matcher exhaustive
     deps:
+      - scripts/run_colmap.py
       - data/processed/images
     outs:
       - data/processed/colmap_db/
@@ -31,6 +35,7 @@ stages:
   colmap2nerf:
     cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
     deps:
+      - scripts/colmap2nerf.py
       - data/processed/colmap_db/
     outs:
       - data/processed/configs/nerf_transforms.json
@@ -38,6 +43,7 @@ stages:
   reconstraction:
     cmd: python scripts/reconstraction.py --config data/processed/configs/global_config.json
     deps:
+      - scripts/reconstraction.py
       - data/processed/configs/nerf_transforms.json
       - data/processed/configs/global_config.json
     outs:

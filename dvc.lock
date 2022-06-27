@@ -8,6 +8,9 @@ stages:
     - path: data/raw/video/video.MP4
       md5: 36448c49d0b5d6aa6a342c4e3edef5a5
       size: 257059112
+    - path: scripts/image_preprocessing.py
+      md5: 6481e39465b961bdf182490705f0ccb1
+      size: 4221
     outs:
     - path: data/raw/images
       md5: e879536c9f394c1bb6b92b7e1217942c.dir
@@ -21,23 +24,29 @@ stages:
       md5: e879536c9f394c1bb6b92b7e1217942c.dir
       size: 232315572
       nfiles: 152
+    - path: scripts/image_preprocessing.py
+      md5: 6481e39465b961bdf182490705f0ccb1
+      size: 4221
     outs:
     - path: data/interim
-      md5: 6e32914486ebb54703b7e1367f47ed9c.dir
-      size: 49599021
+      md5: 31202e8c289c57047d8065f2969f5a23.dir
+      size: 157961782
       nfiles: 152
   remove_background:
     cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder
       data/interim/ --images_no_background data/processed/images --model_type new
     deps:
     - path: data/interim/
-      md5: 6e32914486ebb54703b7e1367f47ed9c.dir
-      size: 49599021
+      md5: 31202e8c289c57047d8065f2969f5a23.dir
+      size: 157961782
       nfiles: 152
+    - path: scripts/image_preprocessing.py
+      md5: 6481e39465b961bdf182490705f0ccb1
+      size: 4221
     outs:
     - path: data/processed/images/
-      md5: 8c0e97a145b768f494cfca3f46dcbd67.dir
-      size: 177160908
+      md5: 101a66f9c75e163e8d5e4bc85f59d133.dir
+      size: 38795653
       nfiles: 152
   colmap:
     cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db

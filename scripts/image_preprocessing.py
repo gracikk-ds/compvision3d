@@ -97,7 +97,7 @@ def crop_resize_images(
         # resize image
         image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
-        cv2.imwrite(str(path_to_cropped_images_folder / image_path.stem / ".png"), image)
+        cv2.imwrite(str(path_to_cropped_images_folder / (image_path.stem + ".png")), image)
 
 
 @main.command()
@@ -122,9 +122,9 @@ def remove_background(
             [
                 "rembg",
                 "p",
-                # "-a",
-                # "-ae",
-                # "15",
+                "-a",
+                "-ae",
+                "15",
                 path_to_cropped_images_folder,
                 images_no_background,
             ]

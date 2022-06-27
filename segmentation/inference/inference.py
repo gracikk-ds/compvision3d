@@ -7,7 +7,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 
 # custom modules
-from segmentation.unet.u2net import U2NET, U2NETP
+from segmentation.unet.u2net import U2NET
 from segmentation.data.data_loader import (
     RescaleT,
     ToTensorLab,
@@ -49,7 +49,7 @@ def segmentation(
     print("output: ", output)
     print("images: ", images)
 
-    net = U2NETP(3, 1)
+    net = U2NET(3, 1)
     net.load_state_dict(
         torch.load(str(ROOT / model_dir), map_location=torch.device("cpu"))
     )
