@@ -50,7 +50,7 @@ def run_colmap(
     # vars preprocessing
     print("start run_colmap")
     os.makedirs(Path(colmap_db).parent, exist_ok=True)
-    
+
     # images
     images = '"' + images + '"'
 

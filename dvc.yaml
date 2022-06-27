@@ -1,12 +1,13 @@
 stages:
 
   extract_images_from_video:
-    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames 150
+    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames 150 --metadata data/raw/video/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
     deps:
       - scripts/image_preprocessing.py
       - data/raw/video/video.MP4
     outs:
       - data/raw/images
+      - data/processed/colmap_db/colmap_text/
 
   crop_and_resize_images:
     cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder data/raw/images --path_to_cropped_images_folder data/interim/
@@ -24,17 +25,18 @@ stages:
     outs:
       - data/processed/images/
 
-  colmap:
-    cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db --text data/processed/colmap_db/colmap_text  --colmap_matcher sequential
-    deps:
-      - scripts/run_colmap.py
-      - data/processed/images
-    outs:
-      - data/processed/colmap_db/
+#  colmap:
+#    cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db --text data/processed/colmap_db/colmap_text  --colmap_matcher exhaustive
+#    deps:
+#      - scripts/run_colmap.py
+#      - data/processed/images
+#    outs:
+#      - data/processed/colmap_db/
 
   colmap2nerf:
     cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
     deps:
+      - data/processed/colmap_db/colmap_text/cameras.txt
       - scripts/colmap2nerf.py
       - data/processed/colmap_db/
     outs:
