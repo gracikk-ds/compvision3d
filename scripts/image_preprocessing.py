@@ -87,16 +87,17 @@ def crop_resize_images(
 
     for image_path in tqdm(images, total=len(images)):
         image = cv2.imread(str(image_path))
-        image = image[:, delta : w - delta]
 
-        width = 1000
-        height = 1000
+        image = image[250:h-650, delta+450: w - (delta + 450)]
+
+        width = 800
+        height = 800
         dim = (width, height)
 
         # resize image
         image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
-        cv2.imwrite(str(path_to_cropped_images_folder / image_path.name), image)
+        cv2.imwrite(str(path_to_cropped_images_folder / image_path.stem / ".png"), image)
 
 
 @main.command()
@@ -121,9 +122,9 @@ def remove_background(
             [
                 "rembg",
                 "p",
-                "-a",
-                "-ae",
-                "15",
+                # "-a",
+                # "-ae",
+                # "15",
                 path_to_cropped_images_folder,
                 images_no_background,
             ]

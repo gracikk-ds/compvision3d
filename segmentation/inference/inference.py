@@ -7,7 +7,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 
 # custom modules
-from segmentation.unet.u2net import U2NET
+from segmentation.unet.u2net import U2NET, U2NETP
 from segmentation.data.data_loader import (
     RescaleT,
     ToTensorLab,
@@ -49,7 +49,7 @@ def segmentation(
     print("output: ", output)
     print("images: ", images)
 
-    net = U2NET(3, 1)
+    net = U2NETP(3, 1)
     net.load_state_dict(
         torch.load(str(ROOT / model_dir), map_location=torch.device("cpu"))
     )
@@ -84,9 +84,9 @@ def segmentation(
                 u2netresult[(u2netresult <= 235) & (u2netresult != 0)] = 127
                 u2netresult[u2netresult >= 235] = 255
 
-            else:
-                u2netresult[u2netresult <= 250] = 0
-                u2netresult[u2netresult >= 250] = 255
+            # else:
+            #     # u2netresult[u2netresult <= 255] = 0
+            #     # u2netresult[u2netresult >= 255] = 255
 
             img_rgba[:, :, 3] = u2netresult
 
