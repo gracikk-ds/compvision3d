@@ -64,11 +64,9 @@ def get_camera_init_qt(meta_):
     :param meta_: parsed metadata
     :return: tuple of (R|T) quaternions
     """
-    z_axis = quaternion.from_vector_part([0, 0, 1])
-    init_q = quaternion.from_rotation_vector(
+    R_acute = quaternion.from_rotation_vector(
         [np.pi / 2 + np.arcsin(meta_["h"] / meta_["l"]), 0, 0]
     )
-    R_acute = init_q * z_axis * init_q.conjugate()
 
     T = quaternion.from_vector_part(
         [0, -np.sqrt(meta_["l"] ** 2 - meta_["h"] ** 2), meta_["h"]]
@@ -84,7 +82,7 @@ def rotate_by_theta(theta_, camera_position):
     :return: new tuple of position quaternions at the angle theta
     """
     theta_rot = quaternion.from_rotation_vector([0, 0, theta_])
-    R = theta_rot * camera_position[0] * theta_rot.conjugate()
+    R = theta_rot * camera_position[0]
     T = theta_rot * camera_position[1] * theta_rot.conjugate()
     return R, T
 
@@ -151,7 +149,6 @@ def extract_images_from_video(
             if (frame_number - TRIM[0]) % reducer == 0:
                 name = path_to_images_folder / f"{frame_to_write_number:03d}.jpg"
                 cv2.imwrite(str(name), frame)
-                frame_to_write_number += 1
                 if compute_rotations:
                     theta = get_theta(frame_number)
                     r, t = rotate_by_theta(theta, camera_init_pose)
@@ -163,6 +160,7 @@ def extract_images_from_video(
                             f'{t.y} {t.z} {CAMERA_ID} '
                             f'{frame_to_write_number:03d}.png\n0 0 -1\n'
                         )  # 0 0 -1 is a placeholder
+                frame_to_write_number += 1
             frame_number += 1
             pbar.update()
 
