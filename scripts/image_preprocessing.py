@@ -93,7 +93,7 @@ def rotate_by_theta(theta_, camera_position):
 @click.option("--path_to_video", default="video/video_blue.MP4", type=str)
 @click.option("--path_to_images_folder", default="images/", type=str)
 @click.option("--amount_of_frames", default=150, type=int)
-@click.option("--metadata", default="data/raw/video/meta.json", type=str)
+@click.option("--metadata", default="data/raw/meta/meta.json", type=str)
 @click.option("--colmap_text_folder", default="data/processed/colmap_db/colmap_text")
 def extract_images_from_video(
     path_to_video: str,
@@ -111,9 +111,7 @@ def extract_images_from_video(
     @param colmap_text_folder: folder to save colmap images
     @return: None
     """
-    print('start')
     os.makedirs(colmap_text_folder, exist_ok=True)
-    print('done!')
     compute_rotations = True
     if not os.path.exists(metadata):
         compute_rotations = False
@@ -136,10 +134,8 @@ def extract_images_from_video(
     frame_to_write_number = 0
 
     if compute_rotations:
-        print('start')
         camera_init_pose = get_camera_init_qt(meta)
         with open(os.path.join(colmap_text_folder, "images.txt"), "w") as out:
-            print('done!')
             pass
 
     with tqdm(total=frame_count) as pbar:
@@ -163,9 +159,9 @@ def extract_images_from_video(
                         os.path.join(colmap_text_folder, "images.txt"), "a"
                     ) as out:
                         out.write(
-                            f"{frame_to_write_number} {r.x} {r.y} {r.z} {t.x} "
+                            f"{frame_to_write_number} {r.w} {r.x} {r.y} {r.z} {t.x} "
                             f'{t.y} {t.z} {CAMERA_ID} '
-                            f'f"{frame_to_write_number:03d}.jpg"\n0 0 -1\n'
+                            f'{frame_to_write_number:03d}.png\n0 0 -1\n'
                         )  # 0 0 -1 is a placeholder
             frame_number += 1
             pbar.update()

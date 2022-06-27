@@ -3,15 +3,19 @@ stages:
   extract_images_from_video:
     cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video
       data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames
-      150
+      150 --metadata data/raw/video/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
     deps:
     - path: data/raw/video/video.MP4
       md5: 36448c49d0b5d6aa6a342c4e3edef5a5
       size: 257059112
     - path: scripts/image_preprocessing.py
-      md5: 846aa3158dff613a6f22418271a71076
-      size: 7452
+      md5: f125787ea57f8b70945d492b04493427
+      size: 7624
     outs:
+    - path: data/processed/colmap_db/colmap_text
+      md5: 30a10f6608bbe2f8dec112a461286b25.dir
+      size: 21418
+      nfiles: 2
     - path: data/raw/images
       md5: 3847d76dd3ca49ebcf2353952ef207f2.dir
       size: 229486879
@@ -25,8 +29,8 @@ stages:
       size: 229486879
       nfiles: 153
     - path: scripts/image_preprocessing.py
-      md5: 1a206908b77e75ecc5735ce936c9cc0a
-      size: 7606
+      md5: f125787ea57f8b70945d492b04493427
+      size: 7624
     outs:
     - path: data/interim
       md5: 60dd1509407db267dca7da9ec17a7cb5.dir
@@ -37,17 +41,17 @@ stages:
       data/interim/ --images_no_background data/processed/images --model_type new
     deps:
     - path: data/interim/
-      md5: 31202e8c289c57047d8065f2969f5a23.dir
-      size: 157961782
-      nfiles: 152
+      md5: 60dd1509407db267dca7da9ec17a7cb5.dir
+      size: 158264112
+      nfiles: 153
     - path: scripts/image_preprocessing.py
-      md5: 6481e39465b961bdf182490705f0ccb1
-      size: 4221
+      md5: b97a09d56f8fbf0c53aefc5736067d51
+      size: 7706
     outs:
     - path: data/processed/images/
-      md5: 101a66f9c75e163e8d5e4bc85f59d133.dir
-      size: 38795653
-      nfiles: 152
+      md5: 9199d79efb4c39b8691ce93c67dcb358.dir
+      size: 66560977
+      nfiles: 153
   colmap:
     cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db
       --text data/processed/colmap_db/colmap_text  --colmap_matcher exhaustive
