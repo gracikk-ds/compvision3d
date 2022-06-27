@@ -13,6 +13,10 @@ from tqdm import tqdm
 from pathlib import Path
 from segmentation.inference.inference import segmentation
 
+import numpy as np
+import quaternion
+import json
+
 
 @click.group()
 def main():
@@ -20,22 +24,104 @@ def main():
     pass
 
 
+TRIM = [39, 2623]
+THETA_DIRECTION = -1  # apply right-hand rule
+SCALE = True
+CAMERA_ID = 0
+
+
+def parse_meta(meta_):
+    """
+    In-place parser
+    :param meta_: metadata dict
+    :return: None
+    """
+
+    meta_["l"] = float(meta_["camera_distance"])
+    meta_["h"] = float(meta_["camera_height"]) - float(meta_["stand_height"])
+    if SCALE:
+        meta_["l"] /= meta_["h"]
+        meta_["h"] /= meta_["h"]
+
+
+def get_theta(n_fr):
+    """
+    Main callable to get theta rotation angle from the frame number
+    :param n_fr: int number of frame
+    :return: theta angle in radians preserving direction sign
+    """
+    if n_fr < TRIM[0]:
+        return 0
+    elif n_fr > TRIM[1]:
+        return THETA_DIRECTION * 2 * np.pi
+    else:
+        return THETA_DIRECTION * 2 * np.pi * (n_fr - TRIM[0]) / (TRIM[1] - TRIM[0])
+
+
+def get_camera_init_qt(meta_):
+    """
+    Return two initial camera quaternion parameters (R|T)
+    :param meta_: parsed metadata
+    :return: tuple of (R|T) quaternions
+    """
+    z_axis = quaternion.from_vector_part([0, 0, 1])
+    init_q = quaternion.from_rotation_vector(
+        [np.pi / 2 + np.arcsin(meta_["h"] / meta_["l"]), 0, 0]
+    )
+    R_acute = init_q * z_axis * init_q.conjugate()
+
+    T = quaternion.from_vector_part(
+        [0, -np.sqrt(meta_["l"] ** 2 - meta_["h"] ** 2), meta_["h"]]
+    )
+    return R_acute, T
+
+
+def rotate_by_theta(theta_, camera_position):
+    """
+    Return new camera position as a tuple of quaternions (R|T)
+    :param theta_: scalar angle in radians with preserved sign
+    :param camera_position: tuple of position quaternions (R|T)
+    :return: new tuple of position quaternions at the angle theta
+    """
+    theta_rot = quaternion.from_rotation_vector([0, 0, theta_])
+    R = theta_rot * camera_position[0] * theta_rot.conjugate()
+    T = theta_rot * camera_position[1] * theta_rot.conjugate()
+    return R, T
+
+
 @main.command()
 @click.option("--path_to_video", default="video/video_blue.MP4", type=str)
 @click.option("--path_to_images_folder", default="images/", type=str)
 @click.option("--amount_of_frames", default=150, type=int)
+@click.option("--metadata", default="data/raw/video/meta.json", type=str)
+@click.option("--colmap_text_folder", default="data/processed/colmap_db/colmap_text")
 def extract_images_from_video(
     path_to_video: str,
     path_to_images_folder: str,
     amount_of_frames: int,
+    metadata: str,
+    colmap_text_folder: str,
 ) -> None:
     """
     Extract predefined number of images from video
     @param path_to_video: path to video file
     @param path_to_images_folder: path to image folder
     @param amount_of_frames: desirable amount of images to extract
+    @param metadata: metadata of the video
+    @param colmap_text_folder: folder to save colmap images
     @return: None
     """
+    print('start')
+    os.makedirs(colmap_text_folder, exist_ok=True)
+    print('done!')
+    compute_rotations = True
+    if not os.path.exists(metadata):
+        compute_rotations = False
+    if compute_rotations:
+        with open(metadata) as j:
+            meta = json.load(j)
+        parse_meta(meta)
+
     print("start extract_images_from_video")
     os.makedirs(path_to_images_folder, exist_ok=True)
     path_to_images_folder = Path(path_to_images_folder)
@@ -43,25 +129,46 @@ def extract_images_from_video(
     cam = cv2.VideoCapture(path_to_video)
 
     frame_count = int(cam.get(cv2.CAP_PROP_FRAME_COUNT))
-    reducer = frame_count // amount_of_frames
+    reducer = (TRIM[1] - TRIM[0]) // amount_of_frames
 
     # frame
     frame_number = 0
     frame_to_write_number = 0
 
+    if compute_rotations:
+        print('start')
+        camera_init_pose = get_camera_init_qt(meta)
+        with open(os.path.join(colmap_text_folder, "images.txt"), "w") as out:
+            print('done!')
+            pass
+
     with tqdm(total=frame_count) as pbar:
         while True:
             # reading from frame
             ret, frame = cam.read()
-            if ret:
-                if frame_number % reducer == 0:
-                    name = path_to_images_folder / f"{frame_to_write_number:03d}.jpg"
-                    cv2.imwrite(str(name), frame)
-                    frame_to_write_number += 1
-                frame_number += 1
-                pbar.update()
-            else:
+            if not ret:
                 break
+            if not TRIM[0] <= frame_number <= TRIM[1]:
+                frame_number += 1
+                continue
+
+            if (frame_number - TRIM[0]) % reducer == 0:
+                name = path_to_images_folder / f"{frame_to_write_number:03d}.jpg"
+                cv2.imwrite(str(name), frame)
+                frame_to_write_number += 1
+                if compute_rotations:
+                    theta = get_theta(frame_number)
+                    r, t = rotate_by_theta(theta, camera_init_pose)
+                    with open(
+                        os.path.join(colmap_text_folder, "images.txt"), "a"
+                    ) as out:
+                        out.write(
+                            f"{frame_to_write_number} {r.x} {r.y} {r.z} {t.x} "
+                            f'{t.y} {t.z} {CAMERA_ID} '
+                            f'f"{frame_to_write_number:03d}.jpg"\n0 0 -1\n'
+                        )  # 0 0 -1 is a placeholder
+            frame_number += 1
+            pbar.update()
 
 
 @main.command()
@@ -88,7 +195,7 @@ def crop_resize_images(
     for image_path in tqdm(images, total=len(images)):
         image = cv2.imread(str(image_path))
 
-        image = image[250:h-650, delta+450: w - (delta + 450)]
+        image = image[250 : h - 650, delta + 450 : w - (delta + 450)]
 
         width = 800
         height = 800
@@ -97,7 +204,9 @@ def crop_resize_images(
         # resize image
         image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
-        cv2.imwrite(str(path_to_cropped_images_folder / (image_path.stem + ".png")), image)
+        cv2.imwrite(
+            str(path_to_cropped_images_folder / (image_path.stem + ".png")), image
+        )
 
 
 @main.command()

@@ -3,13 +3,12 @@ stages:
   extract_images_from_video:
     cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames 150
     deps:
-      - scripts/image_preprocessing.py
       - data/raw/video/video.MP4
     outs:
       - data/raw/images
 
   crop_and_resize_images:
-    cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder data/raw/images --path_to_cropped_images_folder data/interim/
+    cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder data/raw/images --path_to_cropped_images_folder data/interim/ --metadata data/raw/video/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
     deps:
       - scripts/image_preprocessing.py
       - data/raw/images

@@ -152,9 +152,13 @@ def get_colmap_images(text_folder, image_folder, out):
                 c2w = c2w[[1, 0, 2, 3], :]  # swap y and z
                 c2w[2, :] *= -1  # flip whole world upside down
                 up += c2w[0:3, 1]
-                
+
                 file_path = f"../images/{Path(name).stem}"
-                frame = {"file_path": file_path, "sharpness": b, "transform_matrix": c2w}
+                frame = {
+                    "file_path": file_path,
+                    "sharpness": b,
+                    "transform_matrix": c2w,
+                }
                 out["frames"].append(frame)
     return out, up
 
@@ -221,7 +225,7 @@ def colmap2nerf(aabb_scale, image_folder, colmap_text_folder, output):
         f["transform_matrix"] = np.matmul(
             R, f["transform_matrix"]
         )  # rotate up to be the z axis
-    
+
     # find a central point they are all looking at
     print("computing center of attention...")
     totw = 0.0

@@ -9,29 +9,29 @@ stages:
       md5: 36448c49d0b5d6aa6a342c4e3edef5a5
       size: 257059112
     - path: scripts/image_preprocessing.py
-      md5: 6481e39465b961bdf182490705f0ccb1
-      size: 4221
+      md5: 846aa3158dff613a6f22418271a71076
+      size: 7452
     outs:
     - path: data/raw/images
-      md5: e879536c9f394c1bb6b92b7e1217942c.dir
-      size: 232315572
-      nfiles: 152
+      md5: 3847d76dd3ca49ebcf2353952ef207f2.dir
+      size: 229486879
+      nfiles: 153
   crop_and_resize_images:
     cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder
       data/raw/images --path_to_cropped_images_folder data/interim/
     deps:
     - path: data/raw/images
-      md5: e879536c9f394c1bb6b92b7e1217942c.dir
-      size: 232315572
-      nfiles: 152
+      md5: 3847d76dd3ca49ebcf2353952ef207f2.dir
+      size: 229486879
+      nfiles: 153
     - path: scripts/image_preprocessing.py
-      md5: 6481e39465b961bdf182490705f0ccb1
-      size: 4221
+      md5: 1a206908b77e75ecc5735ce936c9cc0a
+      size: 7606
     outs:
     - path: data/interim
-      md5: 31202e8c289c57047d8065f2969f5a23.dir
-      size: 157961782
-      nfiles: 152
+      md5: 60dd1509407db267dca7da9ec17a7cb5.dir
+      size: 158264112
+      nfiles: 153
   remove_background:
     cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder
       data/interim/ --images_no_background data/processed/images --model_type new
