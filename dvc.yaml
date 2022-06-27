@@ -25,7 +25,7 @@ stages:
       - data/processed/images/
 
   colmap:
-    cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db --text data/processed/colmap_db/colmap_text  --colmap_matcher exhaustive
+    cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db --text data/processed/colmap_db/colmap_text  --colmap_matcher sequential
     deps:
       - scripts/run_colmap.py
       - data/processed/images

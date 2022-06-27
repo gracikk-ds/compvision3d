@@ -9,8 +9,8 @@ stages:
       md5: 36448c49d0b5d6aa6a342c4e3edef5a5
       size: 257059112
     - path: scripts/image_preprocessing.py
-      md5: 6481e39465b961bdf182490705f0ccb1
-      size: 4221
+      md5: 8e6cc800a6ac9886f51660d93384b2bd
+      size: 4215
     outs:
     - path: data/raw/images
       md5: e879536c9f394c1bb6b92b7e1217942c.dir
@@ -25,8 +25,8 @@ stages:
       size: 232315572
       nfiles: 152
     - path: scripts/image_preprocessing.py
-      md5: 6481e39465b961bdf182490705f0ccb1
-      size: 4221
+      md5: 8e6cc800a6ac9886f51660d93384b2bd
+      size: 4215
     outs:
     - path: data/interim
       md5: 31202e8c289c57047d8065f2969f5a23.dir
@@ -41,35 +41,41 @@ stages:
       size: 157961782
       nfiles: 152
     - path: scripts/image_preprocessing.py
-      md5: 6481e39465b961bdf182490705f0ccb1
-      size: 4221
+      md5: 8e6cc800a6ac9886f51660d93384b2bd
+      size: 4215
     outs:
     - path: data/processed/images/
-      md5: 101a66f9c75e163e8d5e4bc85f59d133.dir
-      size: 38795653
-      nfiles: 152
+      md5: 438f3d5289191162121979e0738276ed.dir
+      size: 66911716
+      nfiles: 154
   colmap:
     cmd: python scripts/run_colmap.py --images data/processed/images --colmap_db data/processed/colmap_db/colmap.db
-      --text data/processed/colmap_db/colmap_text  --colmap_matcher exhaustive
+      --text data/processed/colmap_db/colmap_text  --colmap_matcher sequential
     deps:
     - path: data/processed/images
-      md5: 8c0e97a145b768f494cfca3f46dcbd67.dir
-      size: 177160908
-      nfiles: 152
+      md5: 438f3d5289191162121979e0738276ed.dir
+      size: 66911716
+      nfiles: 154
+    - path: scripts/run_colmap.py
+      md5: 8b3a970eaa8e57511da3ac4d6e19725c
+      size: 3315
     outs:
     - path: data/processed/colmap_db/
-      md5: 8f22312c21f4d3ce6500eda5d3cb26d0.dir
-      size: 95994849
-      nfiles: 12
+      md5: 4bce54027c28321fc1ad985f25682e1a.dir
+      size: 48628092
+      nfiles: 16
   colmap2nerf:
     cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder
       data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
     deps:
     - path: data/processed/colmap_db/
-      md5: 8f22312c21f4d3ce6500eda5d3cb26d0.dir
-      size: 95994849
-      nfiles: 12
+      md5: 4bce54027c28321fc1ad985f25682e1a.dir
+      size: 48628092
+      nfiles: 16
+    - path: scripts/colmap2nerf.py
+      md5: 88e8d75bc605a8cb68ed67c197e82aa3
+      size: 8095
     outs:
     - path: data/processed/configs/nerf_transforms.json
-      md5: 17f9c109834b75940e734f2c118d1c24
-      size: 8638
+      md5: 433f5c8a97a445f0fd6d87b02ef31a84
+      size: 10498
