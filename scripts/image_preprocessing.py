@@ -64,10 +64,14 @@ def get_camera_init_qt(meta_):
     :param meta_: parsed metadata
     :return: tuple of (R|T) quaternions
     """
-    R_acute = quaternion.from_rotation_vector([-(np.pi/2+np.arcsin(meta_['h']/meta_['l'])),0,0])
+    R_acute = quaternion.from_rotation_vector(
+        [-(np.pi / 2 + np.arcsin(meta_["h"] / meta_["l"])), 0, 0]
+    )
 
-    T = quaternion.from_vector_part([0, -np.sqrt(meta_['l']**2-meta_['h']**2), meta_['h']])
-    return R_acute,T
+    T = quaternion.from_vector_part(
+        [0, -np.sqrt(meta_["l"] ** 2 - meta_["h"] ** 2), meta_["h"]]
+    )
+    return R_acute, T
 
 
 def rotate_by_theta(theta_, camera_position):
@@ -153,8 +157,8 @@ def extract_images_from_video(
                     ) as out:
                         out.write(
                             f"{frame_to_write_number} {r.w} {r.x} {r.y} {r.z} {t.x} "
-                            f'{t.y} {t.z} {CAMERA_ID} '
-                            f'{frame_to_write_number:03d}.png\n0 0 -1\n'
+                            f"{t.y} {t.z} {CAMERA_ID} "
+                            f"{frame_to_write_number:03d}.png\n0 0 -1\n"
                         )  # 0 0 -1 is a placeholder
                 frame_to_write_number += 1
             frame_number += 1
