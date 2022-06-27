@@ -2,4 +2,4 @@
     remote = origin
     autostage = true
 ['remote "origin"']
-    url = gs://3dreconstraction
+    url = https://dagshub.com/gracikk-ds/compvision3d.dvc
