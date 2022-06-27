@@ -29,7 +29,7 @@ def normalization(d):
 def segmentation(
     images: str,
     output: str,
-    trimap: bool = True,
+    trimap: bool = False,
     model_dir: str = "checkpoints/u2net.pth",
 ):
     """
@@ -85,8 +85,8 @@ def segmentation(
                 u2netresult[u2netresult >= 235] = 255
 
             else:
-                u2netresult[u2netresult <= 230] = 0
-                u2netresult[u2netresult >= 230] = 255
+                u2netresult[u2netresult <= 250] = 0
+                u2netresult[u2netresult >= 250] = 255
 
             img_rgba[:, :, 3] = u2netresult
 
