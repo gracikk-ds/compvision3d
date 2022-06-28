@@ -854,33 +854,6 @@ if __name__ == "__main__":
             optimize_light=FLAGS.learn_light and not FLAGS.lock_light,
             optimize_geometry=not FLAGS.lock_pos,
         )
-    else:
-        # ==============================================================================================
-        #  Train with fixed topology (mesh)
-        # ==============================================================================================
-
-        # Load initial guess mesh from file
-        base_mesh = mesh.load_mesh(FLAGS.base_mesh)
-        geometry = DLMesh(base_mesh, FLAGS)
-
-        mat = initial_guess_material(
-            geometry, False, FLAGS, init_mat=base_mesh.material
-        )
-
-        geometry, mat = optimize_mesh(
-            glctx,
-            geometry,
-            mat,
-            lgt,
-            dataset_train,
-            dataset_validate,
-            FLAGS,
-            pass_idx=0,
-            pass_name="mesh_pass",
-            warmup_iter=100,
-            optimize_light=not FLAGS.lock_light,
-            optimize_geometry=not FLAGS.lock_pos,
-        )
 
     # ==============================================================================================
     #  Validate

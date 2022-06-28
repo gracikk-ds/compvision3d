@@ -12,7 +12,7 @@ def save_coefficients(width, height, mtx, dist, path):
     """Save the camera matrix and the distortion coefficients to given path/file."""
     list_of_lines = [
         "# Camera list with one line of data per camera:",
-        "# CAMERA_ID, MODEL, WIDTH, HEIGHT, fl_x, fl_y, k1, k2, p1, p2, cx, cy",
+        "# CAMERA_ID, MODEL, WIDTH, HEIGHT, fl_x, fl_y, cx, cy, k1, k2, p1, p2",
     ]
     os.makedirs(path, exist_ok=True)
     fl_x, fl_y, cx, cy = mtx[0][0], mtx[1][1], mtx[0][2], mtx[1][2]
