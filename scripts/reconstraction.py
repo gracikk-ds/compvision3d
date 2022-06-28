@@ -332,43 +332,45 @@ def validate(glctx, geometry, opt_material, lgt, dataset_validate, out_dir, FLAG
     )
 
     os.makedirs(out_dir, exist_ok=True)
-    with open(os.path.join(out_dir, "metrics.txt"), "w") as fout:
-        fout.write("ID, MSE, PSNR\n")
 
-        print("Running validation")
-        for it, target in enumerate(dataloader_validate):
+    metrics = dict(avg_MSE=None, avg_PSNR=None)
 
-            # Mix validation background
-            target = prepare_batch(target, FLAGS.background)
+    print("Running validation")
+    for it, target in enumerate(dataloader_validate):
 
-            result_image, result_dict = validate_itr(
-                glctx, target, geometry, opt_material, lgt, FLAGS
-            )
+        # Mix validation background
+        target = prepare_batch(target, FLAGS.background)
 
-            # Compute metrics
-            opt = torch.clamp(result_dict["opt"], 0.0, 1.0)
-            ref = torch.clamp(result_dict["ref"], 0.0, 1.0)
+        result_image, result_dict = validate_itr(
+            glctx, target, geometry, opt_material, lgt, FLAGS
+        )
 
-            mse = torch.nn.functional.mse_loss(
-                opt, ref, size_average=None, reduce=None, reduction="mean"
-            ).item()
-            mse_values.append(float(mse))
-            psnr = util.mse_to_psnr(mse)
-            psnr_values.append(float(psnr))
+        # Compute metrics
+        opt = torch.clamp(result_dict["opt"], 0.0, 1.0)
+        ref = torch.clamp(result_dict["ref"], 0.0, 1.0)
 
-            line = "%d, %1.8f, %1.8f\n" % (it, mse, psnr)
-            fout.write(str(line))
+        mse = torch.nn.functional.mse_loss(
+            opt, ref, size_average=None, reduce=None, reduction="mean"
+        ).item()
+        mse_values.append(float(mse))
+        psnr = util.mse_to_psnr(mse)
+        psnr_values.append(float(psnr))
 
-            for k in result_dict.keys():
-                np_img = result_dict[k].detach().cpu().numpy()
-                util.save_image(out_dir + "/" + ("val_%06d_%s.png" % (it, k)), np_img)
+        for k in result_dict.keys():
+            np_img = result_dict[k].detach().cpu().numpy()
+            util.save_image(
+                os.path.join(out_dir, "dmtet_validate") +
+                "/" +
+                ("val_%06d_%s.png" % (it, k)), np_img)
 
-        avg_mse = np.mean(np.array(mse_values))
-        avg_psnr = np.mean(np.array(psnr_values))
-        line = "AVERAGES: %1.4f, %2.3f\n" % (avg_mse, avg_psnr)
-        fout.write(str(line))
-        print("MSE,      PSNR")
-        print("%1.8f, %2.3f" % (avg_mse, avg_psnr))
+    avg_mse = np.mean(np.array(mse_values))
+    avg_psnr = np.mean(np.array(psnr_values))
+    metrics["avg_MSE"] = avg_mse
+    metrics["avg_PSNR"] = avg_psnr
+    with open(os.path.join(out_dir, "metrics.json"), "w") as fp:
+        json.dump(metrics, fp)
+    print("MSE,      PSNR")
+    print("%1.8f, %2.3f" % (avg_mse, avg_psnr))
     return avg_psnr
 
 
@@ -814,7 +816,7 @@ if __name__ == "__main__":
                 mat,
                 lgt,
                 dataset_validate,
-                os.path.join(FLAGS.out_dir, "dmtet_validate"),
+                FLAGS.out_dir,
                 FLAGS,
             )
 
