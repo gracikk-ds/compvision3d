@@ -1,5 +1,38 @@
 schema: '2.0'
 stages:
+  extract_calibration_images:
+    cmd: python scripts/camera_calibration.py extract-calibration-images --video_dir
+      data/raw/calibration/video/calibration.MOV --path_to_images_folder data/raw/calibration/images
+      --amount_of_frames 30
+    deps:
+    - path: data/raw/calibration/video
+      md5: d0982925721723fc238cb9294917d812.dir
+      size: 63767820
+      nfiles: 1
+    - path: scripts/camera_calibration.py
+      md5: c5cb68bf5599c667cc66335ac801316e
+      size: 5871
+    outs:
+    - path: data/raw/calibration/images
+      md5: 50239b461b3e9ced5c1eb3dd262f94bc.dir
+      size: 43004440
+      nfiles: 32
+  camera_calibration:
+    cmd: python scripts/camera_calibration.py calibrate --image_dir data/raw/calibration/images
+      --image_format jpg --output_path data/processed/colmap_db/colmap_text/ --square_size
+      2.5
+    deps:
+    - path: data/raw/calibration/images
+      md5: 50239b461b3e9ced5c1eb3dd262f94bc.dir
+      size: 43004440
+      nfiles: 32
+    - path: scripts/camera_calibration.py
+      md5: c5cb68bf5599c667cc66335ac801316e
+      size: 5871
+    outs:
+    - path: data/processed/colmap_db/colmap_text/cameras.txt
+      md5: 10383fe198a354a8e9f3a9686b093032
+      size: 294
   extract_images_from_video:
     cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video
       data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames
@@ -70,58 +103,9 @@ stages:
       size: 66979454
       nfiles: 154
     - path: scripts/colmap2nerf.py
-      md5: 3fc9456986ca58b59ad01e1b04d4ec2a
-      size: 8154
+      md5: 0a7fab2bdd7116c4b35c19fa22070464
+      size: 8193
     outs:
     - path: data/processed/configs/nerf_transforms.json
-      md5: 326917aa110fe09049b6eeeaee87a81d
-      size: 91596
-  colmap:
-    cmd: python scripts/run_colmap.py --images data/interim --colmap_db data/processed/colmap_db/colmap.db
-      --text data/processed/colmap_db/colmap_text  --colmap_matcher exhaustive
-    deps:
-    - path: data/processed/images
-      md5: 369bcd90204fe366565e92292954b8db.dir
-      size: 66979435
-      nfiles: 154
-    - path: scripts/run_colmap.py
-      md5: b755e80d25da4233c2494147d79a27d0
-      size: 3311
-    outs:
-    - path: data/processed/colmap_db/
-      md5: 2d6e07618fad284ee4a0b1488ae167ca.dir
-      size: 148837209
-      nfiles: 8
-  extract_calibration_images:
-    cmd: python scripts/camera_calibration.py extract-calibration-images --video_dir
-      data/raw/calibration/video/calibration.MOV --path_to_images_folder data/raw/calibration/images
-      --amount_of_frames 30
-    deps:
-    - path: data/raw/calibration/video
-      md5: d0982925721723fc238cb9294917d812.dir
-      size: 63767820
-      nfiles: 1
-    - path: scripts/camera_calibration.py
-      md5: 63034c1b6c157c50a068969660d66fd2
-      size: 5918
-    outs:
-    - path: data/raw/calibration/images
-      md5: 50239b461b3e9ced5c1eb3dd262f94bc.dir
-      size: 43004440
-      nfiles: 32
-  camera_calibration:
-    cmd: python scripts/camera_calibration.py calibrate --image_dir data/raw/calibration/images
-      --image_format jpg --output_path data/processed/colmap_db/colmap_text/ --square_size
-      2.5
-    deps:
-    - path: data/raw/calibration/images
-      md5: 50239b461b3e9ced5c1eb3dd262f94bc.dir
-      size: 43004440
-      nfiles: 32
-    - path: scripts/camera_calibration.py
-      md5: 63034c1b6c157c50a068969660d66fd2
-      size: 5918
-    outs:
-    - path: data/processed/colmap_db/colmap_text/cameras.txt
-      md5: 10383fe198a354a8e9f3a9686b093032
-      size: 294
+      md5: 8a2caa3007ff1fe96f5ab9547b780be5
+      size: 97783
