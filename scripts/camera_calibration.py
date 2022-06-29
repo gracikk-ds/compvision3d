@@ -50,7 +50,7 @@ def save_coefficients(width: int, height: int, mtx: List[List], dist: List, path
     cy_new = cy_new * (800 / 2160)
 
     main_line = " ".join([
-        "1", "OPENCV", str(width), str(height),
+        "1", "OPENCV", str(800), str(800),
         str(fl_x_new), str(fl_y_new), str(cx_new), str(cy_new),
         str(k1), str(k2), str(p1), str(p2)
     ])
