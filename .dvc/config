@@ -1,0 +1,8 @@
+[core]
+    remote = origin
+    autostage = true
+['remote "origin"']
+    url = https://dagshub.com/gracikk-ds/compvision3d.dvc
+    auth = basic
+    user = gracikk-ds
+    password = 87bdb3d5761e99805e6b4eac8a3c7b7096fcddeb

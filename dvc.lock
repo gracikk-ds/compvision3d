@@ -1,0 +1,111 @@
+schema: '2.0'
+stages:
+  extract_calibration_images:
+    cmd: python scripts/camera_calibration.py extract-calibration-images --video_dir
+      data/raw/calibration/video/calibration.MOV --path_to_images_folder data/raw/calibration/images
+      --amount_of_frames 30
+    deps:
+    - path: data/raw/calibration/video
+      md5: d0982925721723fc238cb9294917d812.dir
+      size: 63767820
+      nfiles: 1
+    - path: scripts/camera_calibration.py
+      md5: d8bb20c28fb9c151fc08f9b230d4d4a5
+      size: 5866
+    outs:
+    - path: data/raw/calibration/images
+      md5: 50239b461b3e9ced5c1eb3dd262f94bc.dir
+      size: 43004440
+      nfiles: 32
+  camera_calibration:
+    cmd: python scripts/camera_calibration.py calibrate --image_dir data/raw/calibration/images
+      --image_format jpg --output_path data/processed/colmap_db/colmap_text/ --square_size
+      2.5
+    deps:
+    - path: data/raw/calibration/images
+      md5: 50239b461b3e9ced5c1eb3dd262f94bc.dir
+      size: 43004440
+      nfiles: 32
+    - path: scripts/camera_calibration.py
+      md5: d8bb20c28fb9c151fc08f9b230d4d4a5
+      size: 5866
+    outs:
+    - path: data/processed/colmap_db/colmap_text/cameras.txt
+      md5: 30d55ec91064b78eae29d516e69fc46b
+      size: 292
+  extract_images_from_video:
+    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video
+      data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames
+      150 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
+    deps:
+    - path: data/processed/colmap_db/colmap_text/cameras.txt
+      md5: 30d55ec91064b78eae29d516e69fc46b
+      size: 292
+    - path: data/raw/video/video.MP4
+      md5: 36448c49d0b5d6aa6a342c4e3edef5a5
+      size: 257059112
+    - path: scripts/image_preprocessing.py
+      md5: 9d60d71d3fe2289fae7ef74c9c4b4b1b
+      size: 7521
+    outs:
+    - path: data/processed/colmap_db/colmap_text/images.txt
+      md5: b303866f7017757d57f44e8fe37f7617
+      size: 22774
+    - path: data/raw/images
+      md5: 87a61069b36d202d63b1f4d599743cc4.dir
+      size: 230960112
+      nfiles: 154
+  crop_and_resize_images:
+    cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder
+      data/raw/images --path_to_cropped_images_folder data/interim/
+    deps:
+    - path: data/raw/images
+      md5: 87a61069b36d202d63b1f4d599743cc4.dir
+      size: 230960112
+      nfiles: 154
+    - path: scripts/image_preprocessing.py
+      md5: 9d60d71d3fe2289fae7ef74c9c4b4b1b
+      size: 7521
+    outs:
+    - path: data/interim
+      md5: bf1fee8fa33e246a951c02de4e22ecf3.dir
+      size: 159214161
+      nfiles: 154
+  remove_background:
+    cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder
+      data/interim/ --images_no_background data/processed/images --model_type new
+    deps:
+    - path: checkpoints/u2net.pth
+      md5: 347c3d51b01528e5c6c071e3cff1cb55
+      size: 176290937
+    - path: data/interim/
+      md5: bf1fee8fa33e246a951c02de4e22ecf3.dir
+      size: 159214161
+      nfiles: 154
+    - path: scripts/image_preprocessing.py
+      md5: 9d60d71d3fe2289fae7ef74c9c4b4b1b
+      size: 7521
+    outs:
+    - path: data/processed/images/
+      md5: b9ac6bd9ca7aa15febee3c966228f20e.dir
+      size: 66979454
+      nfiles: 154
+  colmap2nerf:
+    cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder
+      data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
+    deps:
+    - path: data/processed/colmap_db/
+      md5: 225e197849fb15280d95028d2beb5ef2.dir
+      size: 29214
+      nfiles: 4
+    - path: data/processed/images/
+      md5: b9ac6bd9ca7aa15febee3c966228f20e.dir
+      size: 66979454
+      nfiles: 154
+    - path: scripts/colmap2nerf.py
+      md5: 0a7fab2bdd7116c4b35c19fa22070464
+      size: 8193
+    outs:
+    - path: data/processed/configs/nerf_transforms.json
+      md5: eb409b8c9fc33931b9374312fa9adba0
+      size: 97775

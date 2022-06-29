@@ -17,7 +17,7 @@ stages:
       - data/processed/colmap_db/colmap_text/cameras.txt
 
   extract_images_from_video:
-    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames 150 --metadata data/raw/video/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
+    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames 150 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
     deps:
       - scripts/image_preprocessing.py
       - data/raw/video/video.MP4

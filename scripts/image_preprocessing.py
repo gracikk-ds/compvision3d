@@ -132,6 +132,7 @@ def extract_images_from_video(
     frame_to_write_number = 0
 
     if compute_rotations:
+        print("yoy")
         camera_init_pose = get_camera_init_qt(meta)
         with open(os.path.join(colmap_text_folder, "images.txt"), "w") as out:
             pass
