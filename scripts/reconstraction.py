@@ -785,81 +785,76 @@ if __name__ == "__main__":
     else:
         lgt = light.load_env(FLAGS.envmap, scale=FLAGS.env_scale)
 
-    if FLAGS.base_mesh is None:
-        # ==============================================================================================
-        #  If no initial guess, use DMtets to create geometry
-        # ==============================================================================================
+    # Setup geometry for optimization
+    geometry = DMTetGeometry(FLAGS.dmtet_grid, FLAGS.mesh_scale, FLAGS)
 
-        # Setup geometry for optimization
-        geometry = DMTetGeometry(FLAGS.dmtet_grid, FLAGS.mesh_scale, FLAGS)
+    # Setup textures, make initial guess from reference if possible
+    mat = initial_guess_material(geometry, True, FLAGS)
 
-        # Setup textures, make initial guess from reference if possible
-        mat = initial_guess_material(geometry, True, FLAGS)
+    # Run optimization
+    geometry, mat = optimize_mesh(
+        glctx,
+        geometry,
+        mat,
+        lgt,
+        dataset_train,
+        dataset_validate,
+        FLAGS,
+        pass_idx=0,
+        pass_name="dmtet_pass1",
+        optimize_light=FLAGS.learn_light,
+    )
 
-        # Run optimization
-        geometry, mat = optimize_mesh(
+    if FLAGS.local_rank == 0 and FLAGS.validate:
+        validate(
             glctx,
             geometry,
             mat,
             lgt,
-            dataset_train,
             dataset_validate,
+            FLAGS.out_dir,
             FLAGS,
-            pass_idx=0,
-            pass_name="dmtet_pass1",
-            optimize_light=FLAGS.learn_light,
         )
-
-        if FLAGS.local_rank == 0 and FLAGS.validate:
-            validate(
-                glctx,
-                geometry,
-                mat,
-                lgt,
-                dataset_validate,
-                FLAGS.out_dir,
-                FLAGS,
-            )
         
-        # save mesh without textures
-        eval_mesh = geometry.getMesh(mat)
-        os.makedirs(os.path.join(FLAGS.out_dir, "eval_mesh"), exist_ok=True)
-        obj.write_obj(os.path.join(FLAGS.out_dir, "eval_mesh/"), eval_mesh)
-        
-        # Trying to create textured mesh from result
-        base_mesh = xatlas_uvmap(glctx, geometry, mat, FLAGS)
+    # save mesh without textures
+    eval_mesh = geometry.getMesh(mat)
+    os.makedirs(os.path.join(FLAGS.out_dir, "eval_mesh"), exist_ok=True)
+    obj.write_obj(os.path.join(FLAGS.out_dir, "eval_mesh/"), eval_mesh)
 
-        # Free temporaries / cached memory
-        torch.cuda.empty_cache()
-        mat["kd_ks_normal"].cleanup()
-        del mat["kd_ks_normal"]
+    # Trying to create textured mesh from result
+    base_mesh = xatlas_uvmap(glctx, geometry, mat, FLAGS)
 
-        lgt = lgt.clone()
-        geometry = DLMesh(base_mesh, FLAGS)
+    # Free temporaries / cached memory
+    torch.cuda.empty_cache()
+    mat["kd_ks_normal"].cleanup()
+    del mat["kd_ks_normal"]
 
-        if FLAGS.local_rank == 0:
-            # Dump mesh for debugging.
-            os.makedirs(os.path.join(FLAGS.out_dir, "dmtet_mesh"), exist_ok=True)
-            obj.write_obj(os.path.join(FLAGS.out_dir, "dmtet_mesh/"), base_mesh)
-            light.save_env_map(os.path.join(FLAGS.out_dir, "dmtet_mesh/probe.hdr"), lgt)
+    lgt = lgt.clone()
+    geometry = DLMesh(base_mesh, FLAGS)
 
-        # ==============================================================================================
-        #  Pass 2: Train with fixed topology (mesh)
-        # ==============================================================================================
-        geometry, mat = optimize_mesh(
-            glctx,
-            geometry,
-            base_mesh.material,
-            lgt,
-            dataset_train,
-            dataset_validate,
-            FLAGS,
-            pass_idx=1,
-            pass_name="mesh_pass",
-            warmup_iter=100,
-            optimize_light=FLAGS.learn_light and not FLAGS.lock_light,
-            optimize_geometry=not FLAGS.lock_pos,
-        )
+    if FLAGS.local_rank == 0:
+        # Dump mesh for debugging.
+        os.makedirs(os.path.join(FLAGS.out_dir, "dmtet_mesh"), exist_ok=True)
+        obj.write_obj(os.path.join(FLAGS.out_dir, "dmtet_mesh/"), base_mesh)
+        light.save_env_map(os.path.join(FLAGS.out_dir, "dmtet_mesh/probe.hdr"), lgt)
+
+    # ==============================================================================================
+    #  Pass 2: Train with fixed topology (mesh)
+    # ==============================================================================================
+    geometry, mat = optimize_mesh(
+        glctx,
+        geometry,
+        base_mesh.material,
+        lgt,
+        dataset_train,
+        dataset_validate,
+        FLAGS,
+        pass_idx=1,
+        pass_name="mesh_pass",
+        warmup_iter=100,
+        optimize_light=FLAGS.learn_light and not FLAGS.lock_light,
+        optimize_geometry=not FLAGS.lock_pos,
+    )
 
     # ==============================================================================================
     #  Validate
