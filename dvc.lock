@@ -95,9 +95,9 @@ stages:
       data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
     deps:
     - path: data/processed/colmap_db/
-      md5: 225e197849fb15280d95028d2beb5ef2.dir
-      size: 29214
-      nfiles: 4
+      md5: cf76c6b060e52b13209048568d3e0c30.dir
+      size: 29239
+      nfiles: 5
     - path: data/processed/images/
       md5: b9ac6bd9ca7aa15febee3c966228f20e.dir
       size: 66979454
