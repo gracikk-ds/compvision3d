@@ -41,9 +41,10 @@ stages:
     - path: data/processed/colmap_db/colmap_text/cameras.txt
       md5: 30d55ec91064b78eae29d516e69fc46b
       size: 292
-    - path: data/raw/video/video.MP4
-      md5: 36448c49d0b5d6aa6a342c4e3edef5a5
+    - path: data/raw/video
+      md5: fe342910bf4640e8d8ba1ab8acdec8da.dir
       size: 257059112
+      nfiles: 1
     - path: scripts/image_preprocessing.py
       md5: 9d60d71d3fe2289fae7ef74c9c4b4b1b
       size: 7521
