@@ -821,6 +821,8 @@ if __name__ == "__main__":
     os.makedirs(os.path.join(FLAGS.out_dir, "eval_mesh"), exist_ok=True)
     obj.write_obj(os.path.join(FLAGS.out_dir, "eval_mesh/"), eval_mesh)
 
+
+
     # Trying to create textured mesh from result
     base_mesh = xatlas_uvmap(glctx, geometry, mat, FLAGS)
 

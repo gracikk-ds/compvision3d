@@ -1,10 +1,18 @@
 stages:
 
-  camera_calibration:
-    cmd: python scripts/camera_calibration.py --image_dir data/raw/calibration --image_format .jpg --square_size 1.5
+  extract_calibration_images:
+    cmd: python scripts/camera_calibration.py extract-calibration-images --video_dir data/raw/calibration/video/calibration.MOV --path_to_images_folder data/raw/calibration/images --amount_of_frames 30
     deps:
       - scripts/camera_calibration.py
-      - data/raw/calibration
+      - data/raw/calibration/video
+    outs:
+      - data/raw/calibration/images
+
+  camera_calibration:
+    cmd: python scripts/camera_calibration.py calibrate --image_dir data/raw/calibration/images --image_format jpg --output_path data/processed/colmap_db/colmap_text/ --square_size 2.5
+    deps:
+      - scripts/camera_calibration.py
+      - data/raw/calibration/images
     outs:
       - data/processed/colmap_db/colmap_text/cameras.txt
 
@@ -52,16 +60,18 @@ stages:
     outs:
       - data/processed/configs/nerf_transforms.json
 
-  reconstraction:
-    cmd: python scripts/reconstraction.py --config data/processed/configs/global_config.json
-    params:
-      - data/processed/configs/global_config.json
-    metrics:
-      - data/results/metrcis.json
-    deps:
-      - data/processed/irrmaps
-      - data/processed/tets
-      - scripts/reconstraction.py
-      - data/processed/configs/nerf_transforms.json
-    outs:
-      - data/results/
+#  reconstruction:
+#    cmd: python scripts/reconstruction.py --config data/processed/configs/global_config.json
+#    params:
+#      - data/processed/configs/global_config.json
+#    metrics:
+#      - data/results/metrcis.json
+#    deps:
+#      - data/processed/irrmaps
+#      - data/processed/tets
+#      - scripts/reconstruction.py
+#      - data/processed/configs/nerf_transforms.json
+#    outs:
+#      - data/results/eval_mesh/
+#      - data/results/dmtet_mesh/
+#      - data/results/mesh/
