@@ -60,18 +60,18 @@ stages:
     outs:
       - data/processed/configs/nerf_transforms.json
 
-#  reconstruction:
-#    cmd: python scripts/reconstruction.py --config data/processed/configs/global_config.json
-#    params:
-#      - data/processed/configs/global_config.json
-#    metrics:
-#      - data/results/metrcis.json
-#    deps:
-#      - data/processed/irrmaps
-#      - data/processed/tets
-#      - scripts/reconstruction.py
-#      - data/processed/configs/nerf_transforms.json
-#    outs:
-#      - data/results/eval_mesh/
-#      - data/results/dmtet_mesh/
-#      - data/results/mesh/
+  reconstruction:
+    cmd: python scripts/reconstruction.py --config data/processed/configs/global_config.json
+    params:
+      - data/processed/configs/global_config.json
+    metrics:
+      - data/results/metrcis.json
+    deps:
+      - data/processed/irrmaps
+      - data/processed/tets
+      - scripts/reconstruction.py
+      - data/processed/configs/nerf_transforms.json
+    outs:
+      - data/results/eval_mesh/
+      - data/results/dmtet_mesh/
+      - data/results/mesh/
