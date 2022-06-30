@@ -25,7 +25,7 @@ def main():
 
 
 TRIM = [39, 2652]
-THETA_DIRECTION = -1  # apply right-hand rule
+THETA_DIRECTION = 1  # apply right-hand rule
 SCALE = True
 CAMERA_ID = 0
 
@@ -153,6 +153,8 @@ def extract_images_from_video(
                 if compute_rotations:
                     theta = get_theta(frame_number)
                     r, t = rotate_by_theta(theta, camera_init_pose)
+                    r = r.conjugate()  # make it a world to camera transform
+                    t = -r * t * r.conjugate()
                     with open(
                         os.path.join(colmap_text_folder, "images.txt"), "a"
                     ) as out:
@@ -226,9 +228,9 @@ def remove_background(
             [
                 "rembg",
                 "p",
-                "-a",
-                "-ae",
-                "15",
+                # "-a",
+                # "-ae",
+                # "15",
                 path_to_cropped_images_folder,
                 images_no_background,
             ]
