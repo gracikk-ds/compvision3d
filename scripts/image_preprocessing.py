@@ -228,9 +228,9 @@ def remove_background(
             [
                 "rembg",
                 "p",
-                "-a",
-                "-ae",
-                "15",
+                # "-a",
+                # "-ae",
+                # "15",
                 path_to_cropped_images_folder,
                 images_no_background,
             ]

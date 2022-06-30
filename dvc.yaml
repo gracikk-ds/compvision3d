@@ -17,7 +17,7 @@ stages:
       - data/processed/colmap_db/colmap_text/cameras.txt
 
   extract_images_from_video:
-    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames 150 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
+    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames 50 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
     deps:
       - scripts/image_preprocessing.py
       - data/raw/video
@@ -62,6 +62,17 @@ stages:
 
   reconstruction:
    cmd: python scripts/reconstruction.py --config data/processed/configs/global_config.json
+   params:
+     - iter
+     - batch
+     - spp
+     - layers
+     - train_res
+     - texture_res
+     - save_interval
+     - learning_rate
+   metrics:
+     - data/results/metrcis.json
    deps:
      - data/processed/irrmaps
      - data/processed/tets
