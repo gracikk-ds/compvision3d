@@ -151,14 +151,14 @@ def get_colmap_images(text_folder, image_folder, out):
                 c2w[0:3, 1] *= -1
                 c2w = c2w[[1, 0, 2, 3], :]  # swap y and z
                 c2w[2, :] *= -1  # flip whole world upside down
-                up += m[0:3, 2]  # c2w[0:3, 1]
+                up += c2w[0:3, 1]
                 print("hi")
 
                 file_path = f"../images/{Path(name).stem}"
                 frame = {
                     "file_path": file_path,
                     "sharpness": b,
-                    "transform_matrix": m,
+                    "transform_matrix": c2w,
                 }
                 out["frames"].append(frame)
     return out, up
