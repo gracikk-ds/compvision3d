@@ -25,7 +25,7 @@ def main():
 
 
 TRIM = [39, 2652]
-THETA_DIRECTION = -1  # apply right-hand rule
+THETA_DIRECTION = 1  # apply right-hand rule
 SCALE = True
 CAMERA_ID = 0
 
