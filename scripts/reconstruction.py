@@ -356,11 +356,11 @@ def validate(glctx, geometry, opt_material, lgt, dataset_validate, out_dir, FLAG
         psnr = util.mse_to_psnr(mse)
         psnr_values.append(float(psnr))
         
-        os.makedirs(out_dir + "/dmtet_validate", exist_ok=True)
+        os.makedirs(out_dir + "/validate_first_run", exist_ok=True)
         for k in result_dict.keys():
             np_img = result_dict[k].detach().cpu().numpy()
             util.save_image(
-                os.path.join(out_dir, "dmtet_validate") +
+                os.path.join(out_dir, "validate_first_run") +
                 "/" +
                 ("val_%06d_%s.png" % (it, k)), np_img)
 
@@ -820,8 +820,6 @@ if __name__ == "__main__":
     eval_mesh = geometry.getMesh(mat)
     os.makedirs(os.path.join(FLAGS.out_dir, "eval_mesh"), exist_ok=True)
     obj.write_obj(os.path.join(FLAGS.out_dir, "eval_mesh/"), eval_mesh)
-
-
 
     # Trying to create textured mesh from result
     base_mesh = xatlas_uvmap(glctx, geometry, mat, FLAGS)
