@@ -14,12 +14,12 @@ from argparse import Namespace
 from nvdiffrec.render import obj
 from nvdiffrec.render import light
 from nvdiffrec.geometry.dlmesh import DLMesh
-from nvdiffrec.support.uvmap import xatlas_uvmap
+from nvdiffrec.supports.uvmap import xatlas_uvmap
 from nvdiffrec.geometry.dmtet import DMTetGeometry
-from nvdiffrec.support.training import optimize_mesh
+from nvdiffrec.supports.training import optimize_mesh
 from nvdiffrec.dataset.dataset_nerf import DatasetNERF
-from nvdiffrec.support.validation_and_testing import validate
-from nvdiffrec.support.material_utility import initial_guess_material
+from nvdiffrec.supports.validation_and_testing import validate
+from nvdiffrec.supports.material_utility import initial_guess_material
 
 RADIUS = 3.0
 
