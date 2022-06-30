@@ -61,7 +61,7 @@ stages:
       - data/processed/configs/nerf_transforms.json
 
   reconstruction:
-   cmd: python scripts/reconstruction.py --config data/processed/configs/global_config.json
+   cmd: python scripts/reconstruction.py --ref_mesh data/processed/configs --out_dir data/results
    params:
      - iter
      - batch
