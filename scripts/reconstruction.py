@@ -227,12 +227,14 @@ def refinement_run(path_to_flags):
     mat.load_state_dict(torch.load(os.path.join(path_to_pickles, "mat.pt")))
     
     # load mesh
-    eval_mesh = obj.load_obj_without_mat(os.path.join(path_to_pickles, "preprocessed_mesh.pt"))
+    eval_mesh = obj.load_obj_without_mat(os.path.join(path_to_pickles, "preprocessed_mesh.obj"))
     eval_mesh.material = mat
     
+    print("here")
     # load glctx
     glctx = dr.RasterizeGLContext()
-
+    
+    print(f"now we are going to create textures")
     # Trying to create textured mesh from result
     base_mesh = xatlas_uvmap(glctx, geometry, mat, FLAGS, eval_mesh)
 

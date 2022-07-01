@@ -276,37 +276,48 @@ def load_obj_without_mat(obj_path):
                 nfaces.append([n0, n1, n2])
     assert len(tfaces) == len(faces) and len(nfaces) == len(faces)
 
-
+    print("starting to create tensors")
+    print("vertices")
     vertices = torch.tensor(vertices, dtype=torch.float32, device="cuda")
-
+    
+    print("texcoords")
     texcoords = (
         torch.tensor(texcoords, dtype=torch.float32, device="cuda")
         if len(texcoords) > 0
         else None
     )
-
+    
+    print("normals")
     normals = (
         torch.tensor(normals, dtype=torch.float32, device="cuda")
         if len(normals) > 0
         else None
     )
-
+    
+    print("faces")
     faces = torch.tensor(faces, dtype=torch.int64, device="cuda")
-
+    
+    print("tfaces")
     tfaces = (
         torch.tensor(tfaces, dtype=torch.int64, device="cuda")
         if texcoords is not None
         else None
     )
-
+    
+    print("nfaces")
     nfaces = (
         torch.tensor(nfaces, dtype=torch.int64, device="cuda")
         if normals is not None
         else None
     )
-
-    return mesh.Mesh(
+    
+    print("mesh_")
+    mesh_ = mesh.Mesh(
         vertices, faces, normals, nfaces, texcoords, tfaces
     )
+    
+    print("done!")
+    
+    return mesh_
 
 

@@ -19,6 +19,8 @@ def xatlas_uvmap(glctx, geometry, mat, FLAGS, eval_mesh):
     # Create uvs with xatlas
     v_pos = eval_mesh.v_pos.detach().cpu().numpy()
     t_pos_idx = eval_mesh.t_pos_idx.detach().cpu().numpy()
+    
+    print("xatlas.parametrize")
     vmapping, indices, uvs = xatlas.parametrize(v_pos, t_pos_idx)
 
     # Convert to tensors
@@ -29,6 +31,7 @@ def xatlas_uvmap(glctx, geometry, mat, FLAGS, eval_mesh):
 
     new_mesh = mesh.Mesh(v_tex=uvs, t_tex_idx=faces, base=eval_mesh)
 
+    print("render.render_uv")
     mask, kd, ks, normal = render.render_uv(
         glctx, new_mesh, FLAGS.texture_res, eval_mesh.material["kd_ks_normal"]
     )
