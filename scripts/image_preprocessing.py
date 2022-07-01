@@ -125,8 +125,11 @@ def extract_images_from_video(
     parse_meta(meta)
 
     if os.path.exists(theta_path):
+        theta_lookup = {}
         with open(theta_path) as th:
-            theta_lookup = json.load(th)
+            theta_f = json.load(th)
+        for k, v in theta_f.items():
+            theta_lookup[int(k)] = float(v)
     else:
         theta_lookup = None
 
