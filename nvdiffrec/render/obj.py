@@ -90,7 +90,9 @@ def load_obj(filename, clear_ks=True, mtl_override=None):
             mat = _find_mat(all_materials, line.split()[1])
             if not mat in used_materials:
                 used_materials.append(mat)
+                print(used_materials)
             activeMatIdx = used_materials.index(mat)
+            print(activeMatIdx)
         elif prefix == "f":  # Parse face
             vs = line.split()[1:]
             nv = len(vs)
@@ -119,6 +121,7 @@ def load_obj(filename, clear_ks=True, mtl_override=None):
             used_materials, texcoords, tfaces, mfaces
         )
     else:
+        print(used_materials)
         uber_material = used_materials[0]
 
     vertices = torch.tensor(vertices, dtype=torch.float32, device="cuda")
@@ -224,3 +227,85 @@ def write_obj(folder, mesh, save_material=True):
         material.save_mtl(mtl_file, mesh.material)
 
     print("Done exporting mesh")
+
+
+def load_obj_without_mat(obj_path, mat_path):
+    obj_path = os.path.dirname(obj_path)
+
+    # Read entire file
+    with open(obj_path, "r") as f:
+        lines = f.readlines()
+
+    # load vertices
+    vertices, texcoords, normals = [], [], []
+    activeMatIdx = None
+    faces, tfaces, nfaces, mfaces = [], [], [], []
+    for line in lines:
+        if len(line.split()) == 0:
+            continue
+
+        prefix = line.split()[0].lower()
+        if prefix == "v":
+            vertices.append([float(v) for v in line.split()[1:]])
+        elif prefix == "vt":
+            val = [float(v) for v in line.split()[1:]]
+            texcoords.append([val[0], 1.0 - val[1]])
+        elif prefix == "vn":
+            normals.append([float(v) for v in line.split()[1:]])
+
+        elif prefix == "f":  # Parse face
+            vs = line.split()[1:]
+            nv = len(vs)
+            vv = vs[0].split("/")
+            v0 = int(vv[0]) - 1
+            t0 = int(vv[1]) - 1 if vv[1] != "" else -1
+            n0 = int(vv[2]) - 1 if vv[2] != "" else -1
+            for i in range(nv - 2):  # Triangulate polygons
+                vv = vs[i + 1].split("/")
+                v1 = int(vv[0]) - 1
+                t1 = int(vv[1]) - 1 if vv[1] != "" else -1
+                n1 = int(vv[2]) - 1 if vv[2] != "" else -1
+                vv = vs[i + 2].split("/")
+                v2 = int(vv[0]) - 1
+                t2 = int(vv[1]) - 1 if vv[1] != "" else -1
+                n2 = int(vv[2]) - 1 if vv[2] != "" else -1
+                mfaces.append(activeMatIdx)
+                faces.append([v0, v1, v2])
+                tfaces.append([t0, t1, t2])
+                nfaces.append([n0, n1, n2])
+    assert len(tfaces) == len(faces) and len(nfaces) == len(faces)
+
+
+    vertices = torch.tensor(vertices, dtype=torch.float32, device="cuda")
+
+    texcoords = (
+        torch.tensor(texcoords, dtype=torch.float32, device="cuda")
+        if len(texcoords) > 0
+        else None
+    )
+
+    normals = (
+        torch.tensor(normals, dtype=torch.float32, device="cuda")
+        if len(normals) > 0
+        else None
+    )
+
+    faces = torch.tensor(faces, dtype=torch.int64, device="cuda")
+
+    tfaces = (
+        torch.tensor(tfaces, dtype=torch.int64, device="cuda")
+        if texcoords is not None
+        else None
+    )
+
+    nfaces = (
+        torch.tensor(nfaces, dtype=torch.int64, device="cuda")
+        if normals is not None
+        else None
+    )
+
+    return mesh.Mesh(
+        vertices, faces, normals, nfaces, texcoords, tfaces
+    )
+
+
