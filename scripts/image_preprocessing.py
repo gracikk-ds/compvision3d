@@ -24,12 +24,6 @@ def main():
     pass
 
 
-<<<<<<< HEAD
-TRIM = [39, 2652]
-THETA_DIRECTION = 1  # apply right-hand rule
-SCALE = True
-=======
->>>>>>> d7f195f4caf259e18ac8531008ca88ee8b2a6b36
 CAMERA_ID = 0
 
 
