@@ -4,10 +4,11 @@ import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
-
 import yaml
+import torch
 import click
 import torch
+import pickle
 from pathlib import Path
 import nvdiffrast.torch as dr
 from argparse import Namespace
@@ -23,7 +24,7 @@ from nvdiffrec.supports.material_utility import initial_guess_material
 
 RADIUS = 3.0
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).parent.parent
 
 
 def set_flags(ref_mesh, out_dir):
@@ -87,7 +88,7 @@ def set_flags(ref_mesh, out_dir):
 
     # save best params
     with open(ROOT / Path("params.yaml"), "r") as stream:
-        data = yaml.safe_load(stream)["train"]
+        data = yaml.safe_load(stream)
         for key in data:
             FLAGS.__dict__[key] = data[key]
 
@@ -111,9 +112,9 @@ def set_flags(ref_mesh, out_dir):
     return FLAGS
 
 
-@click.command()
-@click.option("--ref_mesh", type=str, default="data/processed/configs/", help="Config file")
-@click.option("--out_dir", type=str, default="data/results", help="Config file")
+# @click.command()
+# @click.option("--ref_mesh", type=str, default="data/processed/configs/", help="Config file")
+# @click.option("--out_dir", type=str, default="data/results", help="Config file")
 def base_run(ref_mesh, out_dir):
 
     FLAGS = set_flags(ref_mesh, out_dir)
@@ -174,21 +175,46 @@ def base_run(ref_mesh, out_dir):
             FLAGS,
         )
 
-    # save mesh without textures
+    save mesh without textures
     eval_mesh = geometry.getMesh(mat)
     os.makedirs(os.path.join(FLAGS.out_dir, "eval_mesh"), exist_ok=True)
     obj.write_obj(os.path.join(FLAGS.out_dir, "eval_mesh/"), eval_mesh)
+    
+    torch.save(mat.state_dict(), os.path.join(FLAGS.out_dir, "mat.pt"))
+    
+    with open(os.path.join(FLAGS.out_dir, "geometry.pickle"), "wb") as file:
+        pickle.dump(geometry, file)
+        
+    with open(os.path.join(FLAGS.out_dir, "lgt.pickle"), "wb") as file:
+        pickle.dump(lgt, file)
 
-    return geometry, mat, FLAGS
+    with open(os.path.join(FLAGS.out_dir, "FLAGS.pickle"), "wb") as file:
+        pickle.dump(FLAGS, file)
 
 
-def refinement_run():
-    FLAGS = set_flags()
-
+def refinement_run(out_dir):
+    
+    eval_mesh = obj.load_obj("data/results/eval_mesh/mesh.obj")
+    
+    # load geometry
+    with open(os.path.join(out_dir, "geometry.pickle"), "rb") as file:
+        geometry = pickle.load(file)
+        
+    with open(os.path.join(out_dir, "lgt.pickle"), "rb") as file:
+        lgt = pickle.load(file)
+        
+    with open(os.path.join(out_dir, "FLAGS.pickle"), "rb") as file:
+        FLAGS = pickle.load(file)
+    
+    # load materials
+    mat = initial_guess_material(geometry, True, FLAGS)
+    mat.load_state_dict(torch.load(os.path.join(out_dir, "mat.pt")))
+    
+    # load glctx
     glctx = dr.RasterizeGLContext()
 
     # Trying to create textured mesh from result
-    base_mesh = xatlas_uvmap(glctx, geometry, mat, FLAGS)
+    base_mesh = xatlas_uvmap(glctx, geometry, mat, FLAGS, eval_mesh)
 
     # Free temporaries / cached memory
     torch.cuda.empty_cache()
@@ -248,5 +274,5 @@ def refinement_run():
     # ----------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
-    base_run()
+# if __name__ == "__main__":
+#     base_run()

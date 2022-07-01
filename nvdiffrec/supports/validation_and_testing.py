@@ -4,7 +4,7 @@ import torch
 import numpy as np
 from nvdiffrec.render import util
 from nvdiffrec.render import light
-from losses_and_batch import prepare_batch
+from .losses_and_batch import prepare_batch
 
 
 ###############################################################################

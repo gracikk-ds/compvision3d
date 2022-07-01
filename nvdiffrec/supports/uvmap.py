@@ -13,8 +13,8 @@ from nvdiffrec.render import material
 
 
 @torch.no_grad()
-def xatlas_uvmap(glctx, geometry, mat, FLAGS):
-    eval_mesh = geometry.getMesh(mat)
+def xatlas_uvmap(glctx, geometry, mat, FLAGS, eval_mesh):
+    # eval_mesh = geometry.getMesh(mat)
 
     # Create uvs with xatlas
     v_pos = eval_mesh.v_pos.detach().cpu().numpy()

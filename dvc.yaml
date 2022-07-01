@@ -72,13 +72,11 @@ stages:
      - save_interval
      - learning_rate
    metrics:
-     - data/results/metrcis.json
+     - data/results/metrics.json
    deps:
      - data/processed/irrmaps
      - data/processed/tets
      - scripts/reconstruction.py
      - data/processed/configs/nerf_transforms.json
    outs:
-     - data/results/eval_mesh/
-     - data/results/dmtet_mesh/
-     - data/results/mesh/
+     - data/results/eval_mesh

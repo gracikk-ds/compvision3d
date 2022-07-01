@@ -2,8 +2,8 @@ import time
 import torch
 import numpy as np
 from nvdiffrec.render import util
-from losses_and_batch import createLoss, prepare_batch
-from validation_and_testing import validate_itr
+from .losses_and_batch import createLoss, prepare_batch
+from .validation_and_testing import validate_itr
 
 
 ###############################################################################
