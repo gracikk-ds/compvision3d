@@ -205,10 +205,12 @@ def optimize_mesh(
                     util.display_image(
                         np_result_image, title="%d / %d" % (it, FLAGS.iter)
                     )
+                    
+                os.makedirs(FLAGS.out_dir + "/" + "train_images", exist_ok=True)
                 if save_image:
                     util.save_image(
                         FLAGS.out_dir
-                        + "/"
+                        + "/" + "train_images" + "/"
                         + ("img_%s_%06d.png" % (pass_name, img_cnt)),
                         np_result_image,
                     )
