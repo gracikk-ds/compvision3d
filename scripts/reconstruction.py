@@ -175,40 +175,72 @@ def base_run(ref_mesh, out_dir):
             FLAGS,
         )
 
+    # path to artefacts
+    path_to_pickles = os.path.join(FLAGS.out_dir, "artefact_storage")
+    os.makedirs(path_to_pickles, exist_ok=True)
+
     # save mesh without textures
     eval_mesh = geometry.getMesh(mat)
-    os.makedirs(os.path.join(FLAGS.out_dir, "eval_mesh"), exist_ok=True)
-    obj.write_obj(os.path.join(FLAGS.out_dir, "eval_mesh/"), eval_mesh)
+    obj.write_obj(path_to_pickles, eval_mesh)
     
-    torch.save(mat.state_dict(), os.path.join(FLAGS.out_dir, "mat.pt"))
+    # save materials
+    torch.save(mat.state_dict(), os.path.join(path_to_pickles, "mat.pt"))
     
-    with open(os.path.join(FLAGS.out_dir, "geometry.pickle"), "wb") as file:
+    # save geometry
+    with open(os.path.join(path_to_pickles, "geometry.pickle"), "wb") as file:
         pickle.dump(geometry, file)
-        
-    with open(os.path.join(FLAGS.out_dir, "lgt.pickle"), "wb") as file:
+    
+    # save lgt
+    with open(os.path.join(path_to_pickles, "lgt.pickle"), "wb") as file:
         pickle.dump(lgt, file)
-
-    with open(os.path.join(FLAGS.out_dir, "FLAGS.pickle"), "wb") as file:
+    
+    # save FLAGS
+    with open(os.path.join(path_to_pickles, "FLAGS.pickle"), "wb") as file:
         pickle.dump(FLAGS, file)
 
 
-def refinement_run(out_dir):
+
+# @click.command()
+# @click.option(
+#     "--path_to_flags", 
+#     type=str,
+#     default="data/results/artefact_storage/FLAGS.pickle", 
+#     help="Config file"
+# )
+def refinement_run(path_to_flags):
     
-    eval_mesh = obj.load_obj("data/results/eval_mesh/mesh.obj")
-    
-    # load geometry
-    with open(os.path.join(out_dir, "geometry.pickle"), "rb") as file:
-        geometry = pickle.load(file)
-        
-    with open(os.path.join(out_dir, "lgt.pickle"), "rb") as file:
-        lgt = pickle.load(file)
-        
-    with open(os.path.join(out_dir, "FLAGS.pickle"), "rb") as file:
+    with open(path_to_flags, "rb") as file:
         FLAGS = pickle.load(file)
     
+    path_to_pickles = os.path.join(FLAGS.out_dir, "artefact_storage")
+    
+    # load geometry
+    with open(os.path.join(path_to_pickles, "geometry.pickle"), "rb") as file:
+        geometry = pickle.load(file)
+    
+    # load light
+    with open(os.path.join(path_to_pickles, "lgt.pickle"), "rb") as file:
+        lgt = pickle.load(file)
+        
     # load materials
     mat = initial_guess_material(geometry, True, FLAGS)
-    mat.load_state_dict(torch.load(os.path.join(out_dir, "mat.pt")))
+    mat.load_state_dict(torch.load(os.path.join(path_to_pickles, "mat.pt")))
+    
+    # load mesh
+    eval_mesh = obj.load_obj_without_mat(os.path.join(path_to_pickles, "preprocessed_mesh.pt"))
+    eval_mesh.material = mat
+
+    # ===============================================================================
+    #  Create data pipeline
+    # ===============================================================================
+    dataset_train = DatasetNERF(
+        os.path.join(FLAGS.ref_mesh, "nerf_transforms.json"),
+        FLAGS,
+        examples=(FLAGS.iter + 1) * FLAGS.batch,
+    )
+    dataset_validate = DatasetNERF(
+        os.path.join(FLAGS.ref_mesh, "nerf_transforms.json"), FLAGS
+    )
     
     # load glctx
     glctx = dr.RasterizeGLContext()

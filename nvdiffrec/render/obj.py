@@ -9,6 +9,7 @@
 
 import os
 import torch
+from tqdm import tqdm
 
 from . import texture
 from . import mesh
@@ -229,8 +230,8 @@ def write_obj(folder, mesh, save_material=True):
     print("Done exporting mesh")
 
 
-def load_obj_without_mat(obj_path, mat_path):
-    obj_path = os.path.dirname(obj_path)
+def load_obj_without_mat(obj_path):
+    obj_path_dir = os.path.dirname(obj_path)
 
     # Read entire file
     with open(obj_path, "r") as f:
@@ -240,7 +241,7 @@ def load_obj_without_mat(obj_path, mat_path):
     vertices, texcoords, normals = [], [], []
     activeMatIdx = None
     faces, tfaces, nfaces, mfaces = [], [], [], []
-    for line in lines:
+    for line in tqdm(lines, total=len(lines)):
         if len(line.split()) == 0:
             continue
 
