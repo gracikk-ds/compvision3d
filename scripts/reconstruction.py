@@ -175,7 +175,7 @@ def base_run(ref_mesh, out_dir):
             FLAGS,
         )
 
-    save mesh without textures
+    # save mesh without textures
     eval_mesh = geometry.getMesh(mat)
     os.makedirs(os.path.join(FLAGS.out_dir, "eval_mesh"), exist_ok=True)
     obj.write_obj(os.path.join(FLAGS.out_dir, "eval_mesh/"), eval_mesh)

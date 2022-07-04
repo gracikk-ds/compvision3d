@@ -275,7 +275,7 @@ def load_obj_without_mat(obj_path, mat_path):
                 nfaces.append([n0, n1, n2])
     assert len(tfaces) == len(faces) and len(nfaces) == len(faces)
 
-
+    print("crating tensors...")
     vertices = torch.tensor(vertices, dtype=torch.float32, device="cuda")
 
     texcoords = (
@@ -303,6 +303,8 @@ def load_obj_without_mat(obj_path, mat_path):
         if normals is not None
         else None
     )
+
+    print("done!")
 
     return mesh.Mesh(
         vertices, faces, normals, nfaces, texcoords, tfaces
