@@ -23,104 +23,86 @@ stages:
       2.5
     deps:
     - path: data/raw/calibration/images
-      md5: 50239b461b3e9ced5c1eb3dd262f94bc.dir
-      size: 43004440
-      nfiles: 32
+      md5: 4adf6415b8b1cb87fc8116f8cf0e81e8.dir
+      size: 47047943
+      nfiles: 30
     - path: scripts/camera_calibration.py
-      md5: d8bb20c28fb9c151fc08f9b230d4d4a5
-      size: 5866
+      md5: 199cf7b0bacc3f3121fec96730cfb0f0
+      size: 5865
     outs:
     - path: data/processed/colmap_db/colmap_text/cameras.txt
-      md5: 30d55ec91064b78eae29d516e69fc46b
-      size: 292
+      md5: 6ae83d14b3b986082983f16578ea6213
+      size: 294
   extract_images_from_video:
     cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video
-      data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames
+      data/raw/video/video.mp4 --path_to_images_folder data/raw/images --amount_of_frames
       50 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
     deps:
     - path: data/processed/colmap_db/colmap_text/cameras.txt
-      md5: 30d55ec91064b78eae29d516e69fc46b
-      size: 292
+      md5: 6ae83d14b3b986082983f16578ea6213
+      size: 294
     - path: data/raw/video
-      md5: fe342910bf4640e8d8ba1ab8acdec8da.dir
-      size: 257059112
+      md5: 8cbd792a29be488d50214ef3cf0ce870.dir
+      size: 174514224
       nfiles: 1
     - path: scripts/image_preprocessing.py
-      md5: 19d0e7024429d85604ec7d5d94e5414f
-      size: 7644
+      md5: 4b9cee02104edba277b4b05863abf35a
+      size: 8408
     outs:
     - path: data/processed/colmap_db/colmap_text/images.txt
-      md5: d81cebce6dbd9685d72fd54f1c01cdca
-      size: 8111
+      md5: 405f7425b779a434e69ccb613735645f
+      size: 8046
     - path: data/raw/images
-      md5: c0a6c85d55f679378ece602dca2c210f.dir
-      size: 74909826
+      md5: 090f9d40edc0f773c7ff47366a511601.dir
+      size: 16956839
       nfiles: 51
   crop_and_resize_images:
     cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder
       data/raw/images --path_to_cropped_images_folder data/interim/
     deps:
     - path: data/raw/images
-      md5: c0a6c85d55f679378ece602dca2c210f.dir
-      size: 74909826
+      md5: 090f9d40edc0f773c7ff47366a511601.dir
+      size: 16956839
       nfiles: 51
     - path: scripts/image_preprocessing.py
-      md5: 19d0e7024429d85604ec7d5d94e5414f
-      size: 7644
+      md5: 4b9cee02104edba277b4b05863abf35a
+      size: 8408
     outs:
     - path: data/interim
-      md5: eb0f0c5ad4c618d00f8a0db6db33eedd.dir
-      size: 52109858
+      md5: 2c6fa5495eb581b655cf7ab433a0a073.dir
+      size: 48700327
       nfiles: 51
   remove_background:
     cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder
       data/interim/ --images_no_background data/processed/images --model_type new
     deps:
-    - path: checkpoints/u2net.pth
-      md5: 347c3d51b01528e5c6c071e3cff1cb55
-      size: 176290937
     - path: data/interim/
-      md5: eb0f0c5ad4c618d00f8a0db6db33eedd.dir
-      size: 52109858
+      md5: 2c6fa5495eb581b655cf7ab433a0a073.dir
+      size: 48700327
       nfiles: 51
     - path: scripts/image_preprocessing.py
-      md5: 19d0e7024429d85604ec7d5d94e5414f
-      size: 7644
+      md5: 4b9cee02104edba277b4b05863abf35a
+      size: 8408
     outs:
     - path: data/processed/images/
-      md5: 720487a8e414007c3910e152673db9d5.dir
-      size: 22027812
+      md5: 0178b7bea3081e65bf0b3f9e3f62e05b.dir
+      size: 41402955
       nfiles: 51
   colmap2nerf:
     cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder
       data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
     deps:
     - path: data/processed/colmap_db/
-      md5: 43df0372883d327176a90079307e041c.dir
-      size: 30677
+      md5: 0d6fa6d098840ab48de15b64b40e47e9.dir
+      size: 30601
       nfiles: 5
     - path: data/processed/images/
-      md5: 720487a8e414007c3910e152673db9d5.dir
-      size: 22027812
+      md5: 0178b7bea3081e65bf0b3f9e3f62e05b.dir
+      size: 41402955
       nfiles: 51
     - path: scripts/colmap2nerf.py
       md5: 8db441f65cf9b0caaf20acb7c55be078
       size: 8182
-    outs:
-    - path: data/processed/configs/nerf_transforms.json
-      md5: 74ccf30bf4096f88674ec17e9b24cd29
-      size: 32454
-  colmap:
-    cmd: python scripts/run_colmap.py --images data/interim --colmap_db data/processed/colmap_db/colmap.db
-      --text data/processed/colmap_db/colmap_text  --colmap_matcher sequential
-    deps:
-    - path: data/processed/images
-      md5: b9ac6bd9ca7aa15febee3c966228f20e.dir
-      size: 66979454
-      nfiles: 154
-    - path: scripts/run_colmap.py
-      md5: b755e80d25da4233c2494147d79a27d0
-      size: 3311
     outs:
     - path: data/processed/colmap_db/
       md5: 1f608b39d7ebe7e33c5ef13dac9068f7.dir
@@ -130,8 +112,15 @@ stages:
     cmd: python scripts/reconstruction.py --config data/processed/configs/global_config.json
     deps:
     - path: data/processed/configs/nerf_transforms.json
-      md5: 74ccf30bf4096f88674ec17e9b24cd29
-      size: 32454
+      md5: 0eec12b0ad54fe2a25b76db29c8faf83
+      size: 32475
+  reconstruction:
+    cmd: python scripts/reconstruction.py --ref_mesh data/processed/configs --out_dir
+      data/results
+    deps:
+    - path: data/processed/configs/nerf_transforms.json
+      md5: 9a1bccaa6ce06ca7c12c7aac61638cba
+      size: 32252
     - path: data/processed/irrmaps
       md5: 2c8ce340164d93d361b7e95851e1222e.dir
       size: 6333948
@@ -141,18 +130,29 @@ stages:
       size: 62364712
       nfiles: 1
     - path: scripts/reconstruction.py
-      md5: 208f7070166fa59eb4628ae926494a6d
-      size: 33171
+      md5: 3cd933342a8352beea1acfb366465ed7
+      size: 8692
+    params:
+      params.yaml:
+        batch: 2
+        iter: 500
+        layers: 1
+        learning_rate:
+        - 0.03
+        - 0.01
+        save_interval: 250
+        spp: 1
+        texture_res:
+        - 1024
+        - 1024
+        train_res:
+        - 800
+        - 800
     outs:
-    - path: data/results/dmtet_mesh/
-      md5: 264dac1887ac70042469e5508700a2d6.dir
-      size: 57943034
-      nfiles: 6
-    - path: data/results/eval_mesh/
-      md5: 488195b704976a3320885c13a6401af3.dir
-      size: 2104901242
+    - path: data/results/eval_mesh
+      md5: a04988bf3507eeca3f7364b87faed9f9.dir
+      size: 2099320297
       nfiles: 2
-    - path: data/results/mesh/
-      md5: 232083e91f8ef65f7269a2379ed1ab25.dir
-      size: 60151964
-      nfiles: 6
+    - path: data/results/metrics.json
+      md5: 31f0084f07920723c8b7747461576662
+      size: 65
