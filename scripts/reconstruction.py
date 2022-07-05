@@ -112,9 +112,9 @@ def set_flags(ref_mesh, out_dir):
     return FLAGS
 
 
-# @click.command()
-# @click.option("--ref_mesh", type=str, default="data/processed/configs/", help="Config file")
-# @click.option("--out_dir", type=str, default="data/results", help="Config file")
+@click.command()
+@click.option("--ref_mesh", type=str, default="data/processed/configs/", help="Config file")
+@click.option("--out_dir", type=str, default="data/results", help="Config file")
 def base_run(ref_mesh, out_dir):
 
     FLAGS = set_flags(ref_mesh, out_dir)
@@ -200,13 +200,13 @@ def base_run(ref_mesh, out_dir):
 
 
 
-# @click.command()
-# @click.option(
-#     "--path_to_flags", 
-#     type=str,
-#     default="data/results/artefact_storage/FLAGS.pickle", 
-#     help="Config file"
-# )
+@click.command()
+@click.option(
+    "--path_to_flags", 
+    type=str,
+    default="data/results/artefact_storage/FLAGS.pickle", 
+    help="Config file"
+)
 def refinement_run(path_to_flags):
     
     with open(path_to_flags, "rb") as file:
@@ -296,5 +296,5 @@ def refinement_run(path_to_flags):
     # ----------------------------------------------------------------------------
 
 
-# if __name__ == "__main__":
-#     base_run()
+if __name__ == "__main__":
+    base_run()

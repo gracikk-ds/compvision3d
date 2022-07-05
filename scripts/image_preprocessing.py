@@ -146,16 +146,15 @@ def extract_images_from_video(
     frame_number = 0
     frame_to_write_number = 0
 
-
-    print("yoy")
     camera_init_pose = get_camera_init_qt(meta)
     with open(os.path.join(colmap_text_folder, "images.txt"), "w") as out:
         pass
 
-    with tqdm(total=frame_count) as pbar:
+    with tqdm(total=meta['trim'][1] - meta['trim'][0]) as pbar:
         while True:
             # reading from frame
             ret, frame = cam.read()
+            frame = cv2.rotate(frame, cv2.ROTATE_180)
             if not ret:
                 break
             if not meta['trim'][0] <= frame_number <= meta['trim'][1]:
@@ -202,19 +201,19 @@ def crop_resize_images(
     images = [x for x in Path(path_to_images_folder).glob("*.jpg")]
 
     h, w, _ = cv2.imread(str(images[0])).shape
-    delta = (w - h) // 2
+    
+    delta = 320
 
     for image_path in tqdm(images, total=len(images)):
         image = cv2.imread(str(image_path))
 
-        image = image[250: h - 650, delta + 450: w - (delta + 450)]
-
-        width = 800
-        height = 800
-        dim = (width, height)
+        image = image[delta: h - delta, delta: w - delta]
+        # width = 800
+        # height = 800
+        # dim = (width, height)
 
         # resize image
-        image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+        # image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
         cv2.imwrite(
             str(path_to_cropped_images_folder / (image_path.stem + ".png")), image
