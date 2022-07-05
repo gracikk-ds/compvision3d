@@ -112,7 +112,17 @@ def set_flags(ref_mesh, out_dir):
     return FLAGS
 
 
-@click.command()
+
+@click.group()
+def main():
+    """
+    Entry point for training scripts
+    """
+    pass
+
+
+
+@main.command()
 @click.option("--ref_mesh", type=str, default="data/processed/configs/", help="Config file")
 @click.option("--out_dir", type=str, default="data/results", help="Config file")
 def base_run(ref_mesh, out_dir):
@@ -200,7 +210,7 @@ def base_run(ref_mesh, out_dir):
 
 
 
-@click.command()
+@main.command()
 @click.option(
     "--path_to_flags", 
     type=str,
@@ -211,6 +221,19 @@ def refinement_run(path_to_flags):
     
     with open(path_to_flags, "rb") as file:
         FLAGS = pickle.load(file)
+        
+    
+    # ===============================================================================
+    #  Create data pipeline
+    # ===============================================================================
+    dataset_train = DatasetNERF(
+        os.path.join(FLAGS.ref_mesh, "nerf_transforms.json"),
+        FLAGS,
+        examples=(FLAGS.iter + 1) * FLAGS.batch,
+    )
+    dataset_validate = DatasetNERF(
+        os.path.join(FLAGS.ref_mesh, "nerf_transforms.json"), FLAGS
+    )
     
     path_to_pickles = os.path.join(FLAGS.out_dir, "artefact_storage")
     
@@ -227,16 +250,18 @@ def refinement_run(path_to_flags):
     mat.load_state_dict(torch.load(os.path.join(path_to_pickles, "mat.pt")))
     
     # load mesh
-    eval_mesh = obj.load_obj_without_mat(os.path.join(path_to_pickles, "preprocessed_mesh.obj"))
+    eval_mesh = obj.load_obj_without_mat(os.path.join(path_to_pickles, "remesh.obj"))
     eval_mesh.material = mat
     
-    print("here")
+    print("Creating RasterizeGLContext")
     # load glctx
     glctx = dr.RasterizeGLContext()
+    print("Done!\n")
     
-    print(f"now we are going to create textures")
+    print(f"Now we are going to create textures")
     # Trying to create textured mesh from result
     base_mesh = xatlas_uvmap(glctx, geometry, mat, FLAGS, eval_mesh)
+    print("Done!\n")
 
     # Free temporaries / cached memory
     torch.cuda.empty_cache()
@@ -297,4 +322,4 @@ def refinement_run(path_to_flags):
 
 
 if __name__ == "__main__":
-    base_run()
+    main()
