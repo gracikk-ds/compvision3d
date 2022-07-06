@@ -206,8 +206,10 @@ def crop_resize_images(
 
     for image_path in tqdm(images, total=len(images)):
         image = cv2.imread(str(image_path))
-
-        image = image[delta: h - delta, delta: w - delta]
+        
+        image = image[20: h - 620, 320: w - 320]
+        
+        # image = image[delta: h - delta, delta: w - delta]
         # width = 800
         # height = 800
         # dim = (width, height)

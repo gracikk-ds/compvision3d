@@ -140,7 +140,6 @@ def get_colmap_images(text_folder, image_folder, out):
                 image_rel = os.path.relpath(image_folder)
                 name = str(f"./{image_rel}/{'_'.join(elems[9:])}")
                 b = sharpness(name)
-                print(name, "sharpness=", b)
                 qvec = np.array(tuple(map(float, elems[1:5])))
                 tvec = np.array(tuple(map(float, elems[5:8])))
                 R = qvec2rotmat(-qvec)
@@ -152,7 +151,6 @@ def get_colmap_images(text_folder, image_folder, out):
                 c2w = c2w[[1, 0, 2, 3], :]  # swap y and z
                 c2w[2, :] *= -1  # flip whole world upside down
                 up += c2w[0:3, 1]
-                print("hi")
 
                 file_path = f"../images/{Path(name).stem}"
                 frame = {
@@ -233,7 +231,6 @@ def colmap2nerf(aabb_scale, image_folder, colmap_text_folder, output):
     totp = np.array([0.0, 0.0, 0.0])
     for f in out["frames"]:
         mf = f["transform_matrix"][0:3, :]
-        print(mf, "\n")
         for g in out["frames"]:
             mg = g["transform_matrix"][0:3, :]
             p, w = closest_point_2_lines(mf[:, 3], mf[:, 2], mg[:, 3], mg[:, 2])
@@ -241,7 +238,6 @@ def colmap2nerf(aabb_scale, image_folder, colmap_text_folder, output):
                 totp += p * w
                 totw += w
     totp /= totw
-    print(totp)  # the cameras are looking at totp
     for f in out["frames"]:
         f["transform_matrix"][0:3, 3] -= totp
 
