@@ -52,30 +52,12 @@ stages:
     outs:
       - data/processed/configs/nerf_transforms.json
 
-  reconstruction-base-run:
-   cmd: python scripts/reconstruction.py base-run --ref_mesh data/processed/configs --out_dir data/results
-   params:
-     - iter
-     - batch
-     - spp
-     - layers
-     - train_res
-     - texture_res
-     - save_interval
-     - learning_rate
-   metrics:
-     - data/results/metrics.json
-   deps:
-     - data/processed/irrmaps
-     - data/processed/tets
-     - scripts/reconstruction.py
-     - data/processed/configs/nerf_transforms.json
-   outs:
-     - data/results/eval_mesh
-     - data/results/train_images
-     
-#   reconstruction-refinement:
-#    cmd: python scripts/reconstruction.py refinement-run --path_to_flags data/results/artefact_storage/FLAGS.pickle
+#  reconstruction:
+#    cmd: python scripts/reconstruction.py --config data/processed/configs/global_config.json
+#    params:
+#      - data/processed/configs/global_config.json
+#    metrics:
+#      - data/results/metrcis.json
 #    deps:
 #      - data/processed/irrmaps
 #      - data/processed/tets
