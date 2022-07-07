@@ -17,8 +17,10 @@ stages:
       - data/processed/colmap_db/colmap_text/cameras.txt
 
   extract_images_from_video:
-    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.mp4 --path_to_images_folder data/raw/images --amount_of_frames 100 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
+    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.mp4 --path_to_images_folder data/raw/images --amount_of_frames 100 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text --theta_path data/raw/meta/theta.json
     deps:
+      - data/raw/meta/theta.json
+      - data/raw/meta/meta.json
       - scripts/image_preprocessing.py
       - data/raw/video
       - data/processed/colmap_db/colmap_text/cameras.txt
@@ -34,44 +36,44 @@ stages:
     outs:
       - data/interim
 
-  remove_background:
-    cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder data/interim/ --images_no_background data/processed/images --model_type new
-    deps:
-      - scripts/image_preprocessing.py
-      - data/interim/
-    outs:
-      - data/processed/images/
+#   remove_background:
+#     cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder data/interim/ --images_no_background data/processed/images --model_type new
+#     deps:
+#       - scripts/image_preprocessing.py
+#       - data/interim/
+#     outs:
+#       - data/processed/images/
 
-  colmap2nerf:
-    cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
-    deps:
-      - data/processed/images/
-      - scripts/colmap2nerf.py
-      - data/processed/colmap_db/
-    outs:
-      - data/processed/configs/nerf_transforms.json
+#   colmap2nerf:
+#     cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
+#     deps:
+#       - data/processed/images/
+#       - scripts/colmap2nerf.py
+#       - data/processed/colmap_db/
+#     outs:
+#       - data/processed/configs/nerf_transforms.json
 
-  reconstruction-base-run:
-   cmd: python scripts/reconstruction.py base-run --ref_mesh data/processed/configs --out_dir data/results
-   params:
-     - iter
-     - batch
-     - spp
-     - layers
-     - train_res
-     - texture_res
-     - save_interval
-     - learning_rate
-   metrics:
-     - data/results/metrics.json
-   deps:
-     - data/processed/irrmaps
-     - data/processed/tets
-     - scripts/reconstruction.py
-     - data/processed/configs/nerf_transforms.json
-   outs:
-     - data/results/eval_mesh
-     
+#   reconstruction-base-run:
+#    cmd: python scripts/reconstruction.py base-run --ref_mesh data/processed/configs --out_dir data/results
+#    params:
+#      - iter
+#      - batch
+#      - spp
+#      - layers
+#      - train_res
+#      - texture_res
+#      - save_interval
+#      - learning_rate
+#    metrics:
+#      - data/results/metrics.json
+#    deps:
+#      - data/processed/irrmaps
+#      - data/processed/tets
+#      - scripts/reconstruction.py
+#      - data/processed/configs/nerf_transforms.json
+#    outs:
+#      - data/results/eval_mesh
+#      - data/results/train_images
      
 #   reconstruction-refinement:
 #    cmd: python scripts/reconstruction.py refinement-run --path_to_flags data/results/artefact_storage/FLAGS.pickle
