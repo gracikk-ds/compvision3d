@@ -53,8 +53,8 @@ stages:
       size: 202316079
       nfiles: 2
     - path: scripts/image_preprocessing.py
-      md5: ed51915c7a31d01f8f70c2c2ba45a35e
-      size: 8476
+      md5: be9fecae0cfcc8197e32e18071b0e02b
+      size: 8475
     outs:
     - path: data/processed/colmap_db/colmap_text/images.txt
       md5: 2889a588dbc8cd458b26b5d8a8ffb12f
@@ -72,8 +72,8 @@ stages:
       size: 19401534
       nfiles: 101
     - path: scripts/image_preprocessing.py
-      md5: ed51915c7a31d01f8f70c2c2ba45a35e
-      size: 8476
+      md5: be9fecae0cfcc8197e32e18071b0e02b
+      size: 8475
     outs:
     - path: data/interim
       md5: fb1be23e7b3eb444c843dc240276c74a.dir
@@ -88,29 +88,29 @@ stages:
       size: 48256991
       nfiles: 101
     - path: scripts/image_preprocessing.py
-      md5: ed51915c7a31d01f8f70c2c2ba45a35e
-      size: 8476
+      md5: be9fecae0cfcc8197e32e18071b0e02b
+      size: 8475
     outs:
     - path: data/processed/images/
-      md5: d751713988987e9331980363e24189ce.dir
-      size: 0
-      nfiles: 0
+      md5: cc90a5a09706f7eaa7f0267b57aa6e04.dir
+      size: 29946561
+      nfiles: 101
   colmap2nerf:
     cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder
       data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
     deps:
     - path: data/processed/colmap_db/
-      md5: e66e9e0c91b219209acd4129db15ff3c.dir
-      size: 16602
+      md5: be0b0d56f583535aee5af6428a1edfd2.dir
+      size: 15735
       nfiles: 3
     - path: data/processed/images/
-      md5: 7fbb46a2b0640b4e8a8b52475bc8bcc6.dir
-      size: 38424466
-      nfiles: 102
+      md5: cc90a5a09706f7eaa7f0267b57aa6e04.dir
+      size: 29946561
+      nfiles: 101
     - path: scripts/colmap2nerf.py
       md5: c12a3161e99daffd3dd70b76036644f9
       size: 8034
     outs:
     - path: data/processed/configs/nerf_transforms.json
-      md5: 718c72ec937cdb140c4b2568a66fbb4c
-      size: 63565
+      md5: 105a6c008904b2b8ef663ecad4dee9b7
+      size: 63549

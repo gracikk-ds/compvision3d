@@ -246,7 +246,7 @@ def remove_background(
                 "p",
                 # "-a",
                 # "-ae",
-                # "15",
+                # "7",
                 path_to_cropped_images_folder,
                 images_no_background,
             ]
