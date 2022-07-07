@@ -1,1 +1,10 @@
-{"camera_distance": "54", "camera_height": "94", "stand_height": "70", "comment": "theta_direction equals to 1 (positive one) if the camera (!!!) is rotating counter-clockwise upon our view down at the static stand. Change in direction yields -1 (negative one) instead", "theta_direction": "1", "trim": [90, 2720]}
+{
+	"camera_distance": "87",
+	"camera_height": "127",
+	"stand_height": "70.3",
+	"trim": [
+		42,
+		2654
+	],
+	"theta_direction": 1
+}
