@@ -97,7 +97,7 @@ def rotate_by_theta(theta_, camera_position):
 @click.option("--path_to_images_folder", default="images/", type=str)
 @click.option("--amount_of_frames", default=150, type=int)
 @click.option("--metadata", default="data/raw/meta/meta.json", type=str)
-@click.option("--theta_path", default="data/raw/meta/theta.json", type=str)
+@click.option("--theta_path", default="None")
 @click.option("--colmap_text_folder", default="data/processed/colmap_db/colmap_text")
 def extract_images_from_video(
         path_to_video: str,

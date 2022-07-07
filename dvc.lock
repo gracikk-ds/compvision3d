@@ -37,13 +37,12 @@ stages:
     cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video
       data/raw/video/video.mp4 --path_to_images_folder data/raw/images --amount_of_frames
       100 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
-      --theta_path data/raw/meta/theta.json
     deps:
     - path: data/processed/colmap_db/colmap_text/cameras.txt
       md5: e12e188ed43e3bfb1c7022d01a99e717
       size: 294
     - path: data/raw/meta/meta.json
-      md5: ce72ecc5f10aace9f581ec1f0a468550
+      md5: b9bc8489f3955c3feeded3a9c1a0ecf2
       size: 314
     - path: data/raw/meta/theta.json
       md5: ea67294e044d9f691f70dff39bc1e900
@@ -53,64 +52,64 @@ stages:
       size: 202316079
       nfiles: 2
     - path: scripts/image_preprocessing.py
-      md5: be9fecae0cfcc8197e32e18071b0e02b
-      size: 8475
+      md5: e72860a0d6ed56577a2c3d808d246959
+      size: 8445
     outs:
     - path: data/processed/colmap_db/colmap_text/images.txt
-      md5: 2889a588dbc8cd458b26b5d8a8ffb12f
-      size: 15416
+      md5: 160a5578d4cc3c8385ffa7904fd967d7
+      size: 15481
     - path: data/raw/images
-      md5: 4c42b7eea41b4fc5bf6a4f0064f3e2ce.dir
-      size: 19401534
-      nfiles: 101
+      md5: e58081f5521f959ff67627f069426617.dir
+      size: 19539051
+      nfiles: 102
   crop_and_resize_images:
     cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder
       data/raw/images --path_to_cropped_images_folder data/interim/
     deps:
     - path: data/raw/images
-      md5: 4c42b7eea41b4fc5bf6a4f0064f3e2ce.dir
-      size: 19401534
-      nfiles: 101
+      md5: e58081f5521f959ff67627f069426617.dir
+      size: 19539051
+      nfiles: 102
     - path: scripts/image_preprocessing.py
-      md5: be9fecae0cfcc8197e32e18071b0e02b
-      size: 8475
+      md5: e72860a0d6ed56577a2c3d808d246959
+      size: 8445
     outs:
     - path: data/interim
-      md5: fb1be23e7b3eb444c843dc240276c74a.dir
-      size: 48256991
-      nfiles: 101
+      md5: affcfaf5d36052c55ebc7a729ff04d28.dir
+      size: 48646291
+      nfiles: 102
   remove_background:
     cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder
       data/interim/ --images_no_background data/processed/images --model_type new
     deps:
     - path: data/interim/
-      md5: fb1be23e7b3eb444c843dc240276c74a.dir
-      size: 48256991
-      nfiles: 101
+      md5: affcfaf5d36052c55ebc7a729ff04d28.dir
+      size: 48646291
+      nfiles: 102
     - path: scripts/image_preprocessing.py
-      md5: be9fecae0cfcc8197e32e18071b0e02b
-      size: 8475
+      md5: e72860a0d6ed56577a2c3d808d246959
+      size: 8445
     outs:
     - path: data/processed/images/
-      md5: cc90a5a09706f7eaa7f0267b57aa6e04.dir
-      size: 29946561
-      nfiles: 101
+      md5: 87121e82d6213970bddf9e8e1557cfbd.dir
+      size: 30152208
+      nfiles: 102
   colmap2nerf:
     cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder
       data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
     deps:
     - path: data/processed/colmap_db/
-      md5: be0b0d56f583535aee5af6428a1edfd2.dir
-      size: 15735
+      md5: 0539af0030666b0c6b72d5f30b84cea0.dir
+      size: 15800
       nfiles: 3
     - path: data/processed/images/
-      md5: cc90a5a09706f7eaa7f0267b57aa6e04.dir
-      size: 29946561
-      nfiles: 101
+      md5: 87121e82d6213970bddf9e8e1557cfbd.dir
+      size: 30152208
+      nfiles: 102
     - path: scripts/colmap2nerf.py
       md5: c12a3161e99daffd3dd70b76036644f9
       size: 8034
     outs:
     - path: data/processed/configs/nerf_transforms.json
-      md5: 105a6c008904b2b8ef663ecad4dee9b7
-      size: 63549
+      md5: 68ebcf419107b3027eca68e939b556e6
+      size: 64228
