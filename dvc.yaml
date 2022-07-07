@@ -17,7 +17,7 @@ stages:
       - data/processed/colmap_db/colmap_text/cameras.txt
 
   extract_images_from_video:
-    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.mp4 --path_to_images_folder data/raw/images --amount_of_frames 50 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
+    cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.mp4 --path_to_images_folder data/raw/images --amount_of_frames 100 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
     deps:
       - scripts/image_preprocessing.py
       - data/raw/video
@@ -73,13 +73,11 @@ stages:
      - data/results/eval_mesh
      
      
-  reconstruction-refinement:
-   cmd: python scripts/reconstruction.py refinement-run --path_to_flags data/results/artefact_storage/FLAGS.pickle
-   deps:
-     - data/processed/irrmaps
-     - data/processed/tets
-     - scripts/reconstruction.py
-     - data/processed/configs/nerf_transforms.json
-     - data/results/artefact_storage
-   outs:
-     - data/results/eval_mesh
+#   reconstruction-refinement:
+#    cmd: python scripts/reconstruction.py refinement-run --path_to_flags data/results/artefact_storage/FLAGS.pickle
+#    deps:
+#      - data/processed/irrmaps
+#      - data/processed/tets
+#      - scripts/reconstruction.py
+#      - data/processed/configs/nerf_transforms.json
+#      - data/results/artefact_storage

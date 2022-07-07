@@ -27,11 +27,11 @@ stages:
       size: 47047943
       nfiles: 30
     - path: scripts/camera_calibration.py
-      md5: 199cf7b0bacc3f3121fec96730cfb0f0
-      size: 5865
+      md5: 5b4201f1b2545bf64fac731e684aabe6
+      size: 5864
     outs:
     - path: data/processed/colmap_db/colmap_text/cameras.txt
-      md5: 6ae83d14b3b986082983f16578ea6213
+      md5: e12e188ed43e3bfb1c7022d01a99e717
       size: 294
   extract_images_from_video:
     cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video
@@ -39,7 +39,7 @@ stages:
       100 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
     deps:
     - path: data/processed/colmap_db/colmap_text/cameras.txt
-      md5: 6ae83d14b3b986082983f16578ea6213
+      md5: e12e188ed43e3bfb1c7022d01a99e717
       size: 294
     - path: data/raw/video
       md5: 54a5a3ed2b6a9edc71b8ddd837cd5fb4.dir
@@ -93,8 +93,8 @@ stages:
       data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
     deps:
     - path: data/processed/colmap_db/
-      md5: feeb2bfdba170cdc709468d93074b4b5.dir
-      size: 16589
+      md5: e66e9e0c91b219209acd4129db15ff3c.dir
+      size: 16602
       nfiles: 3
     - path: data/processed/images/
       md5: 7fbb46a2b0640b4e8a8b52475bc8bcc6.dir
@@ -105,5 +105,5 @@ stages:
       size: 8034
     outs:
     - path: data/processed/configs/nerf_transforms.json
-      md5: 51d59a9c09c80d780dd7c0174036637c
+      md5: 718c72ec937cdb140c4b2568a66fbb4c
       size: 63565

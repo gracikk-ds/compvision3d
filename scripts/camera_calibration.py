@@ -40,7 +40,7 @@ def save_coefficients(width: int, height: int, mtx: List[List], dist: List, path
     # we are doing crop procedure
     # so we have to adjust principal point parameters respectively
     cx_new = cx - 320
-    cy_new = cy - 320
+    cy_new = cy - 20
 
     # then we are doing resize procedures
     # so we have to adjust such parameters as fl_x, fl_y, cx, cy
