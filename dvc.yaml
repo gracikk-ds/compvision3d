@@ -8,41 +8,48 @@ stages:
 #    outs:
 #      - data/raw/calibration/images
 
-  camera_calibration:
-    cmd: python scripts/camera_calibration.py calibrate --image_dir data/raw/calibration/images --image_format jpg --output_path data/processed/colmap_db/colmap_text/ --square_size 2.5
-    deps:
-      - scripts/camera_calibration.py
-      - data/raw/calibration/images
-    outs:
-      - data/processed/colmap_db/colmap_text/cameras.txt
+  # camera_calibration:
+  #   cmd: python scripts/camera_calibration.py calibrate --image_dir data/raw/calibration/images --image_format jpg --output_path data/processed/colmap_db/colmap_text/ --square_size 2.5
+  #   deps:
+  #     - scripts/camera_calibration.py
+  #     - data/raw/calibration/images
+  #   outs:
+  #     - data/processed/colmap_db/colmap_text/cameras.txt
 
   extract_images_from_video:
     cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video data/raw/video/video.MP4 --path_to_images_folder data/raw/images --amount_of_frames 150 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
+    params:
+      - noise_camera
+      - noise_meta
+      - noise_theta
+      - noise_rot
+      - noise_tr
     deps:
       - data/raw/meta/meta.json
       - scripts/image_preprocessing.py
       - data/raw/video
-      - data/processed/colmap_db/colmap_text/cameras.txt
+      - data/processed/colmap_db/colmap_text/cameras_true.txt
     outs:
-      - data/raw/images
+      #- data/raw/images
       - data/processed/colmap_db/colmap_text/images.txt
+      - data/processed/colmap_db/colmap_text/cameras.txt
 
-  crop_and_resize_images:
-    cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder data/raw/images --path_to_cropped_images_folder data/interim/
-    deps:
-      - scripts/image_preprocessing.py
-      - data/raw/images
-    outs:
-      - data/interim
+  # crop_and_resize_images:
+  #   cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder data/raw/images --path_to_cropped_images_folder data/interim/
+  #   deps:
+  #     - scripts/image_preprocessing.py
+  #     - data/raw/images
+  #   outs:
+  #     - data/interim
 
-  remove_background:
-    cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder data/interim/ --images_no_background data/processed/images --model_type new
-    deps:
-#      - checkpoints/u2net.pth
-      - scripts/image_preprocessing.py
-      - data/interim/
-    outs:
-      - data/processed/images/
+#   remove_background:
+#     cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder data/interim/ --images_no_background data/processed/images --model_type new
+#     deps:
+# #      - checkpoints/u2net.pth
+#       - scripts/image_preprocessing.py
+#       - data/interim/
+#     outs:
+#       - data/processed/images/
 
   colmap2nerf:
     cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json

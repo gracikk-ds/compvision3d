@@ -16,6 +16,7 @@ from pathlib import Path
 import numpy as np
 import quaternion
 import json
+import yaml
 
 
 @click.group()
@@ -25,9 +26,9 @@ def main():
 
 
 CAMERA_ID = 0
+ROOT = Path(__file__).parent.parent
 
-
-def parse_meta(meta_):
+def parse_meta(meta_, noise_std=0):
     """
     In-place parser
     :param meta_: metadata dict
@@ -35,7 +36,11 @@ def parse_meta(meta_):
     """
 
     meta_["l"] = float(meta_["camera_distance"])
+    meta_["l"] += np.random.normal(0,meta_["l"]*noise_std) 
+    
     meta_["h"] = float(meta_["camera_height"]) - float(meta_["stand_height"])
+    meta_["h"] += np.random.normal(0,meta_["h"]*noise_std)
+    
     meta_["l"] /= meta_["h"]
     meta_["h"] /= meta_["h"]
 
@@ -44,7 +49,7 @@ def parse_meta(meta_):
     meta_['trim'] = [int(trim_[0]), int(trim_[1])]
 
 
-def get_theta(n_fr, lookup=None, meta_=None):
+def get_theta(n_fr, lookup=None, meta_=None, noise_std=0):
     """
     Main callable to get theta rotation angle from the frame number
     :param n_fr: int number of frame
@@ -52,15 +57,16 @@ def get_theta(n_fr, lookup=None, meta_=None):
     :param meta_: a metadata dict
     :return: theta angle in radians preserving direction sign
     """
+    noise = np.random.normal(0,noise_std)
     if lookup is not None:
-        return lookup[n_fr]
-
+        return lookup[n_fr] + noise
+    
     if n_fr < meta_['trim'][0]:
-        return 0
+        return 0  + noise
     elif n_fr > meta_['trim'][1]:
-        return meta_['theta_direction'] * 2 * np.pi
+        return meta_['theta_direction'] * 2 * np.pi + noise
     else:
-        return meta_['theta_direction'] * 2 * np.pi * (n_fr - meta_['trim'][0]) / (meta_['trim'][1] - meta_['trim'][0])
+        return meta_['theta_direction'] * 2 * np.pi * (n_fr - meta_['trim'][0]) / (meta_['trim'][1] - meta_['trim'][0]) + noise
 
 
 def get_camera_init_qt(meta_):
@@ -120,10 +126,26 @@ def extract_images_from_video(
     os.makedirs(colmap_text_folder, exist_ok=True)
     if not os.path.exists(metadata):
         raise FileNotFoundError("A meta.json file is required")
+    
+    with open(ROOT / Path("params.yaml"), "r") as stream:
+        params = yaml.safe_load(stream)
+    
     with open(metadata) as j:
         meta = json.load(j)
-    parse_meta(meta)
-
+    parse_meta(meta, noise_std=float(params['noise_meta']))
+    
+    with open(os.path.join(colmap_text_folder, 'cameras.txt'), 'w') as nc:
+        with open(os.path.join(colmap_text_folder, 'cameras_true.txt')) as c:
+            for line in c:
+                if line[0] == "#":
+                    continue
+                els = line.split(" ")
+                for i in range(4):
+                    nc.write(els[i]+' ')
+                for i in range(4,len(els)):
+                    nc.write(str(float(els[i])+np.random.normal(0,abs(float(els[i]))*float(params['noise_camera'])))+' ')
+              
+        
     if os.path.exists(theta_path):
         theta_lookup = {}
         with open(theta_path) as th:
@@ -151,24 +173,29 @@ def extract_images_from_video(
         pass
 
     with tqdm(total=meta['trim'][1] - meta['trim'][0]) as pbar:
-        while True:
+        while frame_number<frame_count:
             # reading from frame
-            ret, frame = cam.read()
-            # frame = cv2.rotate(frame, cv2.ROTATE_180)
-            if not ret:
-                break
+            
             if not meta['trim'][0] <= frame_number <= meta['trim'][1]:
                 frame_number += 1
                 continue
 
             if (frame_number - meta['trim'][0]) % reducer == 0:
                 name = path_to_images_folder / f"{frame_to_write_number:03d}.jpg"
-                cv2.imwrite(str(name), frame)
+                
 
-                theta = get_theta(frame_number, lookup=theta_lookup, meta_=meta)
+                theta = get_theta(frame_number, lookup=theta_lookup, meta_=meta, noise_std=float(params['noise_theta']))
                 r, t = rotate_by_theta(theta, camera_init_pose)
                 r = r.conjugate()  # make it a world to camera transform
                 t = -r * t * r.conjugate()
+                
+                r = quaternion.as_rotation_vector(r)
+                r += np.random.normal(0, float(params['noise_rot']), size=(3,))
+                r = quaternion.from_rotation_vector(r)
+                
+                t = quaternion.as_vector_part(t)
+                t += np.random.normal(0, float(params['noise_tr']), size=(3,))
+                t = quaternion.from_vector_part(t)
                 with open(
                         os.path.join(colmap_text_folder, "images.txt"), "a"
                 ) as out:
