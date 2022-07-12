@@ -1,0 +1,18 @@
+---
+iter: 1500
+batch: 2
+spp: 1
+layers: 1
+train_res: [800, 800]
+texture_res: [1024, 1024]
+save_interval: 100
+learning_rate: [0.03, 0.01]
+mesh_scale: 3
+laplace_scale: 3000
+
+# percentle normal noise 0.1 = 10%  X=>X+N(0,X*0.1) 
+noise_meta: 0.0
+noise_theta: 0.0
+noise_rot: 0.0
+noise_tr: 0.0
+noise_camera: 0.0
