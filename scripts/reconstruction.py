@@ -184,7 +184,7 @@ def base_run(ref_mesh, out_dir):
             FLAGS.out_dir,
             FLAGS,
         )
-
+    return
     # path to artefacts
     path_to_pickles = os.path.join(FLAGS.out_dir, "artefact_storage")
     os.makedirs(path_to_pickles, exist_ok=True)
