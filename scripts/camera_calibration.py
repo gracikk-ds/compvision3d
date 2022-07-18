@@ -39,19 +39,19 @@ def save_coefficients(width: int, height: int, mtx: List[List], dist: List, path
 
     # we are doing crop procedure
     # so we have to adjust principal point parameters respectively
-    cx_new = cx - 320
-    cy_new = cy - 20
+    cx_new = cx - 710
+    cy_new = cy - 170
 
     # then we are doing resize procedures
     # so we have to adjust such parameters as fl_x, fl_y, cx, cy
-    # fl_x_new = fl_x * (800 / 3840)
-    # fl_y_new = fl_y * (800 / 2160)
-    # cx_new = cx_new * (800 / 3840)
-    # cy_new = cy_new * (800 / 2160)
+    fl_x_new = fl_x * (800 / 500)
+    fl_y_new = fl_y * (800 / 500)
+    cx_new = cx_new * (800 / 500)
+    cy_new = cy_new * (800 / 500)
 
     main_line = " ".join([
         "1", "OPENCV", str(800), str(800),
-        str(fl_x), str(fl_y), str(cx_new), str(cy_new),
+        str(fl_x_new), str(fl_y_new), str(cx_new), str(cy_new),
         str(k1), str(k2), str(p1), str(p2)
     ])
 
@@ -127,14 +127,14 @@ def extract_calibration_images(
     "--width",
     type=int,
     required=True,
-    default=9,
+    default=13,
     help="Number of intersection points of squares in the long side",
 )
 @click.option(
     "--height",
     type=int,
     required=True,
-    default=6,
+    default=9,
     help="Number of intersection points of squares in the short side",
 )
 @click.option(

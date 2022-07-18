@@ -24,7 +24,7 @@ dvc = {extras = ["gs"], version = "*"}
 # conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 # imageio_download_bin freeimage
 ninja = "^1.10.2"
-PyOpenGL = "^3.1.6"
+# PyOpenGL = "^3.1.6"
 torch = "^1.11.0"
 numpy-quaternion = "^2022.4.2"
 

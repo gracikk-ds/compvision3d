@@ -154,7 +154,7 @@ def extract_images_from_video(
         while True:
             # reading from frame
             ret, frame = cam.read()
-            frame = cv2.rotate(frame, cv2.ROTATE_180)
+            # frame = cv2.rotate(frame, cv2.ROTATE_180)
             if not ret:
                 break
             if not meta['trim'][0] <= frame_number <= meta['trim'][1]:
@@ -201,21 +201,19 @@ def crop_resize_images(
     images = [x for x in Path(path_to_images_folder).glob("*.jpg")]
 
     h, w, _ = cv2.imread(str(images[0])).shape
-    
-    delta = 320
 
     for image_path in tqdm(images, total=len(images)):
         image = cv2.imread(str(image_path))
         
-        image = image[20: h - 620, 320: w - 320]
+        image = image[170: h - 410, 710: w - 710]
         
         # image = image[delta: h - delta, delta: w - delta]
-        # width = 800
-        # height = 800
-        # dim = (width, height)
+        width = 800
+        height = 800
+        dim = (width, height)
 
         # resize image
-        # image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+        image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
         cv2.imwrite(
             str(path_to_cropped_images_folder / (image_path.stem + ".png")), image
