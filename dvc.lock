@@ -2,114 +2,114 @@ schema: '2.0'
 stages:
   extract_calibration_images:
     cmd: python scripts/camera_calibration.py extract-calibration-images --video_dir
-      data/raw/calibration/video/calibration.MOV --path_to_images_folder data/raw/calibration/images
-      --amount_of_frames 30
+      data/raw/calibration/video/calibration.mov --path_to_images_folder data/raw/calibration/images
+      --amount_of_frames 45
     deps:
     - path: data/raw/calibration/video
-      md5: d0982925721723fc238cb9294917d812.dir
-      size: 63767820
+      md5: 406fffc8188212a3765b670a51cce842.dir
+      size: 115520103
       nfiles: 1
     - path: scripts/camera_calibration.py
-      md5: d8bb20c28fb9c151fc08f9b230d4d4a5
-      size: 5866
+      md5: 3dd4aafdff0ad4b342e05ee9e9388748
+      size: 5862
     outs:
     - path: data/raw/calibration/images
-      md5: 50239b461b3e9ced5c1eb3dd262f94bc.dir
-      size: 43004440
-      nfiles: 32
+      md5: 94923d78f2ae625c4b400594acb68734.dir
+      size: 9800045
+      nfiles: 46
   camera_calibration:
     cmd: python scripts/camera_calibration.py calibrate --image_dir data/raw/calibration/images
       --image_format jpg --output_path data/processed/colmap_db/colmap_text/ --square_size
-      2.5
+      2
     deps:
     - path: data/raw/calibration/images
-      md5: ca2f55e1c23101ec340ad1e888618921.dir
-      size: 45435228
-      nfiles: 29
+      md5: 94923d78f2ae625c4b400594acb68734.dir
+      size: 9800045
+      nfiles: 46
     - path: scripts/camera_calibration.py
-      md5: 5b4201f1b2545bf64fac731e684aabe6
-      size: 5864
+      md5: 3dd4aafdff0ad4b342e05ee9e9388748
+      size: 5862
     outs:
     - path: data/processed/colmap_db/colmap_text/cameras.txt
-      md5: e12e188ed43e3bfb1c7022d01a99e717
-      size: 294
+      md5: 8df09b73fdff02bdae2c5ae45a1f8e99
+      size: 288
   extract_images_from_video:
     cmd: python scripts/image_preprocessing.py extract-images-from-video --path_to_video
-      data/raw/video/video.mp4 --path_to_images_folder data/raw/images --amount_of_frames
-      100 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
+      data/raw/video/video.mov --path_to_images_folder data/raw/images --amount_of_frames
+      150 --metadata data/raw/meta/meta.json --colmap_text_folder data/processed/colmap_db/colmap_text
     deps:
     - path: data/processed/colmap_db/colmap_text/cameras.txt
-      md5: e12e188ed43e3bfb1c7022d01a99e717
-      size: 294
+      md5: 8df09b73fdff02bdae2c5ae45a1f8e99
+      size: 288
     - path: data/raw/meta/meta.json
-      md5: b9bc8489f3955c3feeded3a9c1a0ecf2
-      size: 314
+      md5: 1f177f7f84713e2eee2a4deaa31ba7fc
+      size: 322
     - path: data/raw/meta/theta.json
       md5: ea67294e044d9f691f70dff39bc1e900
       size: 48870
     - path: data/raw/video
-      md5: b382c91d4d46b09ddb89f59608cf0272.dir
-      size: 202316079
-      nfiles: 2
+      md5: 3f54d7b849a68e15f341fd0037dbf694.dir
+      size: 130747165
+      nfiles: 1
     - path: scripts/image_preprocessing.py
-      md5: e72860a0d6ed56577a2c3d808d246959
-      size: 8445
+      md5: 0ace2f7a3e57b2ef0c1aace9ff19ed8c
+      size: 8419
     outs:
     - path: data/processed/colmap_db/colmap_text/images.txt
-      md5: 160a5578d4cc3c8385ffa7904fd967d7
-      size: 15481
+      md5: 8bd3341782065d9e04070e0ab5618373
+      size: 24697
     - path: data/raw/images
-      md5: e58081f5521f959ff67627f069426617.dir
-      size: 19539051
-      nfiles: 102
+      md5: 74d1e387ab252a4fa64b8d3b267130f7.dir
+      size: 25938688
+      nfiles: 155
   crop_and_resize_images:
     cmd: python scripts/image_preprocessing.py crop-resize-images --path_to_images_folder
       data/raw/images --path_to_cropped_images_folder data/interim/
     deps:
     - path: data/raw/images
-      md5: e58081f5521f959ff67627f069426617.dir
-      size: 19539051
-      nfiles: 102
+      md5: 74d1e387ab252a4fa64b8d3b267130f7.dir
+      size: 25938688
+      nfiles: 155
     - path: scripts/image_preprocessing.py
-      md5: e72860a0d6ed56577a2c3d808d246959
-      size: 8445
+      md5: 0ace2f7a3e57b2ef0c1aace9ff19ed8c
+      size: 8419
     outs:
     - path: data/interim
-      md5: affcfaf5d36052c55ebc7a729ff04d28.dir
-      size: 48646291
-      nfiles: 102
+      md5: 026402e6cce469194ca276c50c815c02.dir
+      size: 51568284
+      nfiles: 155
   remove_background:
     cmd: python scripts/image_preprocessing.py remove-background --path_to_cropped_images_folder
       data/interim/ --images_no_background data/processed/images --model_type new
     deps:
     - path: data/interim/
-      md5: affcfaf5d36052c55ebc7a729ff04d28.dir
-      size: 48646291
-      nfiles: 102
+      md5: 026402e6cce469194ca276c50c815c02.dir
+      size: 51568284
+      nfiles: 155
     - path: scripts/image_preprocessing.py
-      md5: e72860a0d6ed56577a2c3d808d246959
-      size: 8445
+      md5: 0ace2f7a3e57b2ef0c1aace9ff19ed8c
+      size: 8419
     outs:
     - path: data/processed/images/
-      md5: 87121e82d6213970bddf9e8e1557cfbd.dir
-      size: 30152208
-      nfiles: 102
+      md5: 2dffa50b1a2bf55ebecdb6f38fb2ceff.dir
+      size: 28441663
+      nfiles: 155
   colmap2nerf:
     cmd: python scripts/colmap2nerf.py --image_folder data/processed/images --colmap_text_folder
       data/processed/colmap_db/colmap_text --output data/processed/configs/nerf_transforms.json
     deps:
     - path: data/processed/colmap_db/
-      md5: 0539af0030666b0c6b72d5f30b84cea0.dir
-      size: 15800
+      md5: 063a6e298ac84081472ba42c919fda59.dir
+      size: 25010
       nfiles: 3
     - path: data/processed/images/
-      md5: 87121e82d6213970bddf9e8e1557cfbd.dir
-      size: 30152208
-      nfiles: 102
+      md5: 2dffa50b1a2bf55ebecdb6f38fb2ceff.dir
+      size: 28441663
+      nfiles: 155
     - path: scripts/colmap2nerf.py
       md5: c12a3161e99daffd3dd70b76036644f9
       size: 8034
     outs:
     - path: data/processed/configs/nerf_transforms.json
-      md5: 68ebcf419107b3027eca68e939b556e6
-      size: 64228
+      md5: 29b21501c5d08a585999cb8cf6b7ed96
+      size: 97240
