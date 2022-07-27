@@ -5,6 +5,7 @@ import numpy as np
 from nvdiffrec.render import util
 from .losses_and_batch import createLoss, prepare_batch
 from .validation_and_testing import validate_itr
+from .rotation_conversions import axis_angle_to_matrix
 
 
 ###############################################################################
@@ -34,7 +35,12 @@ class Trainer(torch.nn.Module):
         self.optimize_light = optimize_light
         self.image_loss_fn = image_loss_fn
         self.FLAGS = FLAGS
-
+        
+        self.learnable_transform = torch.nn.Parameter(
+            torch.tensor([[0,0,0.01]],dtype=torch.float, device="cuda"),
+            requires_grad=True) # 0,0,0.025 is a good start
+        #torch.nn.init.normal_(self.learnable_transform, 0, 0.05)
+                                                      
         if not self.optimize_light:
             with torch.no_grad():
                 self.light.build_mips()
@@ -44,6 +50,20 @@ class Trainer(torch.nn.Module):
         self.geo_params = list(self.geometry.parameters()) if optimize_geometry else []
 
     def forward(self, target, it):
+        l_tr_3d = axis_angle_to_matrix(self.learnable_transform)[0]
+        #l_tr = torch.cat([l_tr_3d, torch.zeros((3,1), dtype=torch.float, device="cuda")], -1)
+        #l_tr = torch.cat([l_tr, torch.tensor([[0,0,0,1]], dtype=torch.float, device="cuda")], 0)
+        #print(target["campos"], target["mv"])
+        target["campos"] = target["campos"] @ l_tr_3d.T #!!!
+        proj = target["mvp"] @ torch.linalg.inv(target["mv"])
+        mv_campos = torch.cat([target["mv"][...,:3,:3],
+                               -target["mv"][...,:3,:3]@torch.unsqueeze(target["campos"],-1)], -1) # ?? why minus
+        mv_campos = torch.cat([mv_campos, torch.tensor([[[0,0,0,1]],[[0,0,0,1]]], dtype=torch.float, device="cuda")], 1)
+        target["mv"] = mv_campos
+        target["mvp"] = proj @ target["mv"]
+        #print(target["campos"], target["mv"])
+        
+        
         if self.optimize_light:
             self.light.build_mips()
             if self.FLAGS.camera_space_light:
@@ -243,17 +263,38 @@ def optimize_mesh(
         #  Backpropagate
         # ============================================================================
         total_loss.backward()
+        
+        TOTAL = 1200
+        START = 70
+        tr_lr = 0.1 # why minus ??
+        UPDATE_SLEEP = 60
+        def _get_local_lr(it_, max_lr=tr_lr, start=START, total_steps=TOTAL):
+            if it_ < start:
+                return 0
+            else:
+                return max_lr*np.sin(np.linspace(0, np.pi, total_steps-start+1))[it_-start]
+            
+        if it % UPDATE_SLEEP == 0:
+            print('GRAD: ', trainer.learnable_transform.grad)
+            lr = _get_local_lr(it) 
+            with torch.no_grad():
+                updated = trainer.learnable_transform - lr / UPDATE_SLEEP * trainer.learnable_transform.grad
+                trainer.learnable_transform.copy_(updated)
+            trainer.learnable_transform.grad.zero_()
+        
         if hasattr(lgt, "base") and lgt.base.grad is not None and optimize_light:
             lgt.base.grad *= 64
         if "kd_ks_normal" in opt_material:
             opt_material["kd_ks_normal"].encoder.params.grad /= 8.0
 
         optimizer.step()
-        scheduler.step()
+        if it >= START:
+            scheduler.step()
 
         if optimize_geometry:
             optimizer_mesh.step()
-            scheduler_mesh.step()
+            if it >= START:
+                scheduler_mesh.step()
 
         # ===========================================================================
         #  Clamp trainables to reasonable range
@@ -292,5 +333,7 @@ def optimize_mesh(
                     util.time_to_text(remaining_time),
                 )
             )
+            print(trainer.learnable_transform)
+            print(axis_angle_to_matrix(trainer.learnable_transform)) #!!!
 
     return geometry, opt_material

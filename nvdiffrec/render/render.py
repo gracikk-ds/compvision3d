@@ -298,11 +298,16 @@ def render_mesh(
         if not torch.is_tensor(mtx_in)
         else mtx_in
     )
+
     view_pos = prepare_input_vector(view_pos)
 
     # clip space transform
     v_pos_clip = ru.xfm_points(mesh.v_pos[None, ...], mtx_in)
-
+    
+    #print('\n\n grad_fns') #!!!
+    #print(mtx_in.grad_fn,view_pos.grad_fn, v_pos_clip.grad_fn)
+    #print('\n')
+    
     # Render all layers front-to-back
     layers = []
     with dr.DepthPeeler(ctx, v_pos_clip, mesh.t_pos_idx.int(), full_res) as peeler:
